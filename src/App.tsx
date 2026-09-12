@@ -6,20 +6,30 @@ import { SecurityAuditor } from './components/SecurityAuditor';
 import { TelemetryHub } from './components/TelemetryHub';
 import { DeploymentInspector } from './components/DeploymentInspector';
 import { SubmissionPack } from './components/SubmissionPack';
+import { CommandPalette } from './components/CommandPalette';
 import { Cloud } from 'lucide-react';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('studio');
   const [selectedRegion, setSelectedRegion] = useState<string>('ap-southeast-2');
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
 
   return (
     <div className="min-h-screen bg-[#0A101D] text-slate-100 flex flex-col font-sans selection:bg-[#FF9900] selection:text-slate-950">
+      {/* Command Palette Modal */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectTab={(tab) => setActiveTab(tab)}
+      />
+
       {/* Navigation Header */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         selectedRegion={selectedRegion}
         setSelectedRegion={setSelectedRegion}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
 
       {/* Main Studio Body */}

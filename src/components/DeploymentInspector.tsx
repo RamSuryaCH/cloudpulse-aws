@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Globe, Server, Database, Zap, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
+import { sounds } from '../utils/soundEffects';
 
 interface DeploymentInspectorProps {
   selectedRegion: string;
@@ -127,7 +128,10 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
             return (
               <div
                 key={layer.id}
-                onClick={() => setActiveLayer(layer.id)}
+                onClick={() => {
+                  sounds.playClick();
+                  setActiveLayer(layer.id);
+                }}
                 className={`aws-card p-4 cursor-pointer flex items-center justify-between transition-all duration-200 ${
                   isSelected ? 'aws-card-active' : ''
                 }`}

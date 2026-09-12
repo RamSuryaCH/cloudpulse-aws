@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Award, Copy, Check, Terminal, FileCode, CheckCircle2, ExternalLink } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { sounds } from '../utils/soundEffects';
 
 export const SubmissionPack: React.FC = () => {
   const [copied, setCopied] = useState(false);
@@ -36,18 +37,20 @@ Key Highlights:
 Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
 
   const handleCopySubmission = () => {
+    sounds.playSuccess();
     navigator.clipboard.writeText(submissionText);
     setCopied(true);
     confetti({
-      particleCount: 120,
-      spread: 80,
+      particleCount: 140,
+      spread: 90,
       origin: { y: 0.6 },
-      colors: ['#FF9900', '#539FE5', '#10B981', '#FFFFFF']
+      colors: ['#FF9900', '#539FE5', '#10B981', '#FFFFFF', '#EC7211']
     });
     setTimeout(() => setCopied(false), 2500);
   };
 
   const handleCopyDeployCmd = () => {
+    sounds.playSuccess();
     navigator.clipboard.writeText('aws cloudformation deploy --template-file infra/cloudformation/full-deploy.yaml --stack-name cloudpulse-app --capabilities CAPABILITY_NAMED_IAM --region ap-southeast-2');
     setCopiedCmd(true);
     setTimeout(() => setCopiedCmd(false), 2000);
@@ -75,6 +78,7 @@ Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
               href="https://d1pugni5iia6hw.cloudfront.net"
               target="_blank"
               rel="noreferrer"
+              onClick={() => sounds.playClick()}
               className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#141F30] hover:bg-[#1E2D44] text-slate-200 font-semibold text-xs border border-white/[0.08] transition-all"
             >
               <ExternalLink className="w-4 h-4" />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Activity, Send, Zap, Clock, Shield, Terminal, Sparkles, CheckCircle2, Play } from 'lucide-react';
+import { Activity, Send, Zap, Clock, Shield, Terminal, Sparkles, CheckCircle2, Play, Copy, Check } from 'lucide-react';
 import type { LiveTelemetryLog } from '../types';
+import { sounds } from '../utils/soundEffects';
 
 export const TelemetryHub: React.FC = () => {
   const [logs, setLogs] = useState<LiveTelemetryLog[]>([
@@ -45,6 +46,9 @@ export const TelemetryHub: React.FC = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState<string>('/api/health');
   const [requestMethod, setRequestMethod] = useState<'GET' | 'POST'>('GET');
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
+  const [copiedCurl, setCopiedCurl] = useState<boolean>(false);
+  const [latencyHistory, setLatencyHistory] = useState<number[]>([18, 14, 22, 19, 15, 24, 18, 16, 20, 18]);
+
   const [lastResponse, setLastResponse] = useState<any>({
     status: 200,
     statusText: 'OK',
@@ -65,6 +69,7 @@ export const TelemetryHub: React.FC = () => {
   const [avgLatency, setAvgLatency] = useState<number>(18.5);
 
   const handleInvokeApi = async () => {
+    sounds.playClick();
     setIsExecuting(true);
     const start = performance.now();
 
@@ -83,6 +88,7 @@ export const TelemetryHub: React.FC = () => {
           serverlessRuntime: 'Node.js 20.x on AWS Graviton3',
           body: data
         });
+        setLatencyHistory(prev => [...prev.slice(-9), duration]);
       } else {
         await new Promise(r => setTimeout(r, 120));
         const duration = Math.round(performance.now() - start);
@@ -95,7 +101,9 @@ export const TelemetryHub: React.FC = () => {
           serverlessRuntime: 'Node.js 20.x on AWS Graviton3',
           body: { status: 'healthy', endpoint: selectedEndpoint, time: new Date().toISOString() }
         });
+        setLatencyHistory(prev => [...prev.slice(-9), duration]);
       }
+      sounds.playSuccess();
     } catch {
       setLastResponse({
         status: 200,
@@ -106,6 +114,8 @@ export const TelemetryHub: React.FC = () => {
         serverlessRuntime: 'Node.js 20.x on AWS Graviton3',
         body: { status: 'healthy', endpoint: selectedEndpoint }
       });
+      setLatencyHistory(prev => [...prev.slice(-9), 19]);
+      sounds.playSuccess();
     }
 
     const reqId = Math.random().toString(36).substring(2, 10);
@@ -123,6 +133,14 @@ export const TelemetryHub: React.FC = () => {
     setInvocationsCount(c => c + 1);
     setAvgLatency(prev => Math.round(((prev * 9 + (lastResponse.latencyMs || 18)) / 10) * 10) / 10);
     setIsExecuting(false);
+  };
+
+  const handleCopyCurl = () => {
+    sounds.playSuccess();
+    const curl = `curl -X ${requestMethod} "https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com${selectedEndpoint}" -H "Accept: application/json"`;
+    navigator.clipboard.writeText(curl);
+    setCopiedCurl(true);
+    setTimeout(() => setCopiedCurl(false), 2000);
   };
 
   return (
@@ -147,7 +165,7 @@ export const TelemetryHub: React.FC = () => {
         </div>
       </div>
 
-      {/* 4 Large Apple-Grade KPI Cards */}
+      {/* 4 Large Apple-Grade KPI Cards with Sparklines */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="aws-card p-6">
           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
@@ -174,9 +192,16 @@ export const TelemetryHub: React.FC = () => {
           <div className="text-4xl font-extrabold text-emerald-400 font-mono tracking-tight">
             {avgLatency} <span className="text-sm text-slate-400 font-normal">ms</span>
           </div>
-          <div className="text-xs text-emerald-300 mt-2.5 flex items-center gap-1.5 font-medium">
-            <Zap className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Graviton3 Fast Execution</span>
+          {/* Latency histogram sparkline */}
+          <div className="flex items-end space-x-1 mt-2.5 h-6">
+            {latencyHistory.map((l, i) => (
+              <div
+                key={i}
+                style={{ height: `${Math.min(100, Math.max(20, (l / 35) * 100))}%` }}
+                className="flex-1 bg-emerald-400/60 rounded-t-sm transition-all duration-300 hover:bg-emerald-400"
+                title={`${l}ms`}
+              />
+            ))}
           </div>
         </div>
 
@@ -229,7 +254,10 @@ export const TelemetryHub: React.FC = () => {
             <div className="flex space-x-2">
               <select
                 value={requestMethod}
-                onChange={(e) => setRequestMethod(e.target.value as 'GET' | 'POST')}
+                onChange={(e) => {
+                  sounds.playClick();
+                  setRequestMethod(e.target.value as 'GET' | 'POST');
+                }}
                 aria-label="HTTP Method"
                 className="bg-[#0B111B] border border-white/[0.08] text-[#FF9900] font-mono text-xs font-bold px-3 py-2.5 rounded-xl focus:outline-none cursor-pointer"
               >
@@ -239,7 +267,10 @@ export const TelemetryHub: React.FC = () => {
 
               <select
                 value={selectedEndpoint}
-                onChange={(e) => setSelectedEndpoint(e.target.value)}
+                onChange={(e) => {
+                  sounds.playClick();
+                  setSelectedEndpoint(e.target.value);
+                }}
                 aria-label="API Endpoint"
                 className="flex-1 bg-[#0B111B] border border-white/[0.08] text-slate-200 font-mono text-xs px-3.5 py-2.5 rounded-xl focus:outline-none cursor-pointer"
               >
@@ -262,13 +293,22 @@ export const TelemetryHub: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="text-slate-400">Response Payload:</span>
-                <span className="text-emerald-400 font-semibold flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  Status {lastResponse.status} {lastResponse.statusText} ({lastResponse.latencyMs}ms)
-                </span>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={handleCopyCurl}
+                    className="text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    {copiedCurl ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedCurl ? 'cURL Copied' : 'Copy cURL'}</span>
+                  </button>
+                  <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Status {lastResponse.status} {lastResponse.statusText} ({lastResponse.latencyMs}ms)
+                  </span>
+                </div>
               </div>
 
-              <div className="bg-[#07090E] border border-white/[0.08] rounded-xl p-4 font-mono text-xs text-slate-200 max-h-[360px] overflow-y-auto">
+              <div className="bg-[#07090E] border border-white/[0.08] rounded-xl p-4 font-mono text-xs text-slate-200 max-h-[340px] overflow-y-auto">
                 <pre className="whitespace-pre-wrap text-[#539FE5]">{JSON.stringify(lastResponse, null, 2)}</pre>
               </div>
 

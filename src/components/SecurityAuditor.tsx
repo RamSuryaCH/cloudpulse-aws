@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle, Copy, Check, ChevronDown, ChevronUp, RefreshCw, Sparkles } from 'lucide-react';
 import { SECURITY_AUDIT_ITEMS } from '../data/awsServices';
 import type { SecurityAuditItem } from '../types';
+import { sounds } from '../utils/soundEffects';
 
 export const SecurityAuditor: React.FC = () => {
   const [selectedPillar, setSelectedPillar] = useState<string>('All');
@@ -12,6 +13,16 @@ export const SecurityAuditor: React.FC = () => {
 
   const pillars = ['All', 'Security', 'Reliability', 'Performance', 'Cost', 'Operations', 'Sustainability'];
 
+  // Pillar scores for Radar Chart
+  const pillarScores: Record<string, number> = {
+    'Security': 100,
+    'Reliability': 96,
+    'Performance': 98,
+    'Cost': 100,
+    'Operations': 95,
+    'Sustainability': 97,
+  };
+
   const filteredItems = selectedPillar === 'All' 
     ? items 
     : items.filter(i => i.pillar === selectedPillar);
@@ -21,17 +32,34 @@ export const SecurityAuditor: React.FC = () => {
 
   const handleCopySnippet = (id: string, snippet?: string) => {
     if (!snippet) return;
+    sounds.playSuccess();
     navigator.clipboard.writeText(snippet);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
   const handleRescan = () => {
+    sounds.playSwitch();
     setIsScanning(true);
     setTimeout(() => {
+      sounds.playSuccess();
       setIsScanning(false);
     }, 1000);
   };
+
+  // Helper to compute polygon points for 6-pillar Radar Chart
+  const getRadarPoints = (scores: number[], radius: number, cx: number, cy: number) => {
+    return scores.map((val, idx) => {
+      const angle = (Math.PI * 2 / 6) * idx - Math.PI / 2;
+      const r = (val / 100) * radius;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      return `${x},${y}`;
+    }).join(' ');
+  };
+
+  const radarPillars = ['Security', 'Reliability', 'Performance', 'Cost', 'Operations', 'Sustainability'];
+  const radarScores = radarPillars.map(p => pillarScores[p]);
 
   return (
     <div className="space-y-8">
@@ -54,10 +82,10 @@ export const SecurityAuditor: React.FC = () => {
         </div>
       </div>
 
-      {/* Scorecard Hero Banner */}
+      {/* Scorecard Hero Banner + 6-Pillar Radar Visualizer */}
       <div className="aws-card p-8">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-          <div className="md:col-span-8 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-7 space-y-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
                 <ShieldCheck className="w-6 h-6 stroke-[2.2]" />
@@ -83,48 +111,89 @@ export const SecurityAuditor: React.FC = () => {
                 IAM Violations: <span className="text-emerald-400 font-bold">0</span>
               </span>
             </div>
+
+            <div className="pt-2">
+              <button
+                onClick={handleRescan}
+                disabled={isScanning}
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#141F30] hover:bg-[#1E2D44] text-slate-200 text-xs font-semibold transition-all border border-white/[0.08] active:scale-95"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin text-[#FF9900]' : ''}`} />
+                <span>{isScanning ? 'Scanning Audit Rules...' : 'Re-run Compliance Scan'}</span>
+              </button>
+            </div>
           </div>
 
-          {/* Radial Score Gauge */}
-          <div className="md:col-span-4 flex flex-col items-center justify-center p-6 rounded-2xl bg-[#0B111B] border border-white/[0.08]">
+          {/* 6-Pillar Interactive Radar Diagram & Score */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center p-6 rounded-2xl bg-[#0B111B] border border-white/[0.08]">
             <div className="relative flex items-center justify-center">
-              <svg className="w-32 h-32 transform -rotate-90">
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="52"
-                  className="text-slate-800"
-                  strokeWidth="9"
-                  stroke="currentColor"
-                  fill="transparent"
+              {/* Radar Spider SVG */}
+              <svg width="220" height="200" viewBox="0 0 220 200" className="overflow-visible">
+                {/* Background grid concentric polygons */}
+                {[0.25, 0.5, 0.75, 1.0].map((level, i) => (
+                  <polygon
+                    key={i}
+                    points={getRadarPoints([100 * level, 100 * level, 100 * level, 100 * level, 100 * level, 100 * level], 70, 110, 100)}
+                    fill="none"
+                    stroke="#1E2D44"
+                    strokeWidth="1"
+                    strokeDasharray={level === 1.0 ? "none" : "2 2"}
+                  />
+                ))}
+
+                {/* Radar Area Polygon */}
+                <polygon
+                  points={getRadarPoints(radarScores, 70, 110, 100)}
+                  fill="rgba(16, 185, 129, 0.2)"
+                  stroke="#10B981"
+                  strokeWidth="2.5"
+                  className="transition-all duration-700 ease-out"
                 />
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="52"
-                  className="text-emerald-400 transition-all duration-1000 ease-out"
-                  strokeWidth="9"
-                  strokeDasharray={326}
-                  strokeDashoffset={326 - (326 * score) / 100}
-                  strokeLinecap="round"
-                  stroke="currentColor"
-                  fill="transparent"
-                />
+
+                {/* Radar Vertices Dots */}
+                {radarScores.map((scoreVal, idx) => {
+                  const angle = (Math.PI * 2 / 6) * idx - Math.PI / 2;
+                  const r = (scoreVal / 100) * 70;
+                  const x = 110 + r * Math.cos(angle);
+                  const y = 100 + r * Math.sin(angle);
+                  return (
+                    <circle
+                      key={idx}
+                      cx={x}
+                      cy={y}
+                      r="4"
+                      fill="#FF9900"
+                      stroke="#0B111B"
+                      strokeWidth="1.5"
+                    />
+                  );
+                })}
+
+                {/* Labels around perimeter */}
+                {radarPillars.map((p, idx) => {
+                  const angle = (Math.PI * 2 / 6) * idx - Math.PI / 2;
+                  const x = 110 + 92 * Math.cos(angle);
+                  const y = 100 + 86 * Math.sin(angle);
+                  return (
+                    <text
+                      key={idx}
+                      x={x}
+                      y={y}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      className="text-[9px] font-mono fill-slate-300 font-semibold"
+                    >
+                      {p.slice(0, 4)}
+                    </text>
+                  );
+                })}
               </svg>
-              <div className="absolute flex flex-col items-center justify-center">
-                <span className="text-3xl font-extrabold text-white font-mono">{score}%</span>
-                <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">PASSED</span>
-              </div>
             </div>
 
-            <button
-              onClick={handleRescan}
-              disabled={isScanning}
-              className="mt-4 flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#141F30] hover:bg-[#1E2D44] text-slate-200 text-xs font-semibold transition-all border border-white/[0.08] active:scale-95"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin text-[#FF9900]' : ''}`} />
-              <span>{isScanning ? 'Scanning Audit Rules...' : 'Re-run Compliance Scan'}</span>
-            </button>
+            <div className="mt-3 flex items-center justify-between w-full pt-3 border-t border-white/[0.06] text-xs font-mono">
+              <span className="text-slate-400">Overall Score:</span>
+              <span className="text-emerald-400 font-extrabold text-sm">{score}% EXCELLENT</span>
+            </div>
           </div>
         </div>
       </div>
@@ -134,7 +203,10 @@ export const SecurityAuditor: React.FC = () => {
         {pillars.map((pillar) => (
           <button
             key={pillar}
-            onClick={() => setSelectedPillar(pillar)}
+            onClick={() => {
+              sounds.playSwitch();
+              setSelectedPillar(pillar);
+            }}
             className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
               selectedPillar === pillar
                 ? 'bg-[#FF9900]/20 text-[#FF9900] border border-[#FF9900]/40 shadow-sm'
@@ -156,7 +228,10 @@ export const SecurityAuditor: React.FC = () => {
               className="aws-card overflow-hidden transition-all duration-200"
             >
               <div
-                onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                onClick={() => {
+                  sounds.playClick();
+                  setExpandedId(isExpanded ? null : item.id);
+                }}
                 className="p-5 flex items-center justify-between cursor-pointer select-none"
               >
                 <div className="flex items-center space-x-4">

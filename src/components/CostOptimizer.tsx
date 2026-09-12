@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DollarSign, Zap, TrendingDown, ShieldCheck, CheckCircle2, BellRing, Sparkles } from 'lucide-react';
 import type { CostParameters } from '../types';
+import { sounds } from '../utils/soundEffects';
 
 export const CostOptimizer: React.FC = () => {
   const [params, setParams] = useState<CostParameters>({
@@ -49,6 +50,7 @@ export const CostOptimizer: React.FC = () => {
   const freeTierReqPercent = Math.min(100, Math.round((params.monthlyRequests / 1000000) * 100));
 
   const triggerBudgetTest = () => {
+    sounds.playSuccess();
     setSimulatedAlertTriggered(true);
     setTimeout(() => setSimulatedAlertTriggered(false), 3500);
   };
@@ -164,7 +166,10 @@ export const CostOptimizer: React.FC = () => {
               max="5000000"
               step="10000"
               value={params.monthlyRequests}
-              onChange={(e) => setParams({ ...params, monthlyRequests: Number(e.target.value), lambdaExecutions: Number(e.target.value) })}
+              onChange={(e) => {
+                sounds.playClick();
+                setParams({ ...params, monthlyRequests: Number(e.target.value), lambdaExecutions: Number(e.target.value) });
+              }}
               className="w-full accent-[#FF9900] bg-[#0B111B] h-2.5 rounded-lg cursor-pointer"
             />
             <div className="flex justify-between text-[11px] text-slate-400 font-mono">
@@ -185,7 +190,10 @@ export const CostOptimizer: React.FC = () => {
               min="1"
               max="50"
               value={params.storageGB}
-              onChange={(e) => setParams({ ...params, storageGB: Number(e.target.value) })}
+              onChange={(e) => {
+                sounds.playClick();
+                setParams({ ...params, storageGB: Number(e.target.value) });
+              }}
               className="w-full accent-[#FF9900] bg-[#0B111B] h-2.5 rounded-lg cursor-pointer"
             />
             <div className="flex justify-between text-[11px] text-slate-400 font-mono">
@@ -207,7 +215,10 @@ export const CostOptimizer: React.FC = () => {
               max="1500"
               step="10"
               value={params.dataTransferGB}
-              onChange={(e) => setParams({ ...params, dataTransferGB: Number(e.target.value) })}
+              onChange={(e) => {
+                sounds.playClick();
+                setParams({ ...params, dataTransferGB: Number(e.target.value) });
+              }}
               className="w-full accent-[#FF9900] bg-[#0B111B] h-2.5 rounded-lg cursor-pointer"
             />
             <div className="flex justify-between text-[11px] text-slate-400 font-mono">
@@ -229,7 +240,10 @@ export const CostOptimizer: React.FC = () => {
               max="500"
               step="5"
               value={params.avgDurationMs}
-              onChange={(e) => setParams({ ...params, avgDurationMs: Number(e.target.value) })}
+              onChange={(e) => {
+                sounds.playClick();
+                setParams({ ...params, avgDurationMs: Number(e.target.value) });
+              }}
               className="w-full accent-[#FF9900] bg-[#0B111B] h-2.5 rounded-lg cursor-pointer"
             />
             <div className="flex justify-between text-[11px] text-slate-400 font-mono">
@@ -245,7 +259,10 @@ export const CostOptimizer: React.FC = () => {
               <input
                 type="checkbox"
                 checked={params.useFreeTier}
-                onChange={(e) => setParams({ ...params, useFreeTier: e.target.checked })}
+                onChange={(e) => {
+                  sounds.playSwitch();
+                  setParams({ ...params, useFreeTier: e.target.checked });
+                }}
                 className="w-4 h-4 rounded accent-[#FF9900]"
               />
               <div>
@@ -258,7 +275,10 @@ export const CostOptimizer: React.FC = () => {
               <input
                 type="checkbox"
                 checked={params.useGraviton}
-                onChange={(e) => setParams({ ...params, useGraviton: e.target.checked })}
+                onChange={(e) => {
+                  sounds.playSwitch();
+                  setParams({ ...params, useGraviton: e.target.checked });
+                }}
                 className="w-4 h-4 rounded accent-[#FF9900]"
               />
               <div>

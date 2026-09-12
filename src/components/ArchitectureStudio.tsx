@@ -25,6 +25,7 @@ import {
 import { AWS_SERVICES, ARCHITECTURE_TEMPLATES } from '../data/awsServices';
 import type { ArchitectureNode, ArchitectureConnection, ArchitectureTemplate } from '../types';
 import { generateTerraform, generateCDK, generatePulumi } from '../utils/codeGenerators';
+import { sounds } from '../utils/soundEffects';
 
 interface ArchitectureStudioProps {
   selectedRegion: string;
@@ -41,6 +42,7 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
   const [isSimulatingTraffic, setIsSimulatingTraffic] = useState(true);
 
   const handleSelectTemplate = (template: ArchitectureTemplate) => {
+    sounds.playSwitch();
     setCurrentTemplate(template);
     setNodes(template.nodes);
     setConnections(template.connections);
@@ -48,6 +50,7 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
   };
 
   const handleAddService = (serviceId: string) => {
+    sounds.playSuccess();
     const service = AWS_SERVICES.find(s => s.id === serviceId);
     if (!service) return;
 
@@ -77,6 +80,7 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
   };
 
   const handleDeleteNode = (nodeId: string) => {
+    sounds.playDelete();
     setNodes(prev => prev.filter(n => n.id !== nodeId));
     setConnections(prev => prev.filter(c => c.from !== nodeId && c.to !== nodeId));
     if (selectedNodeId === nodeId) {
@@ -109,12 +113,14 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
       : generatePulumi(nodes, connections);
 
   const handleCopyCode = () => {
+    sounds.playSuccess();
     navigator.clipboard.writeText(currentCode);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
   const handleDownloadCode = () => {
+    sounds.playSuccess();
     const filename = codeMode === 'terraform' 
       ? 'main.tf' 
       : codeMode === 'cdk' 
@@ -209,7 +215,10 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
             {['all', 'compute', 'storage', 'database', 'networking'].map((cat) => (
               <button
                 key={cat}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => {
+                  sounds.playClick();
+                  setActiveCategory(cat);
+                }}
                 className={`px-3 py-1.5 rounded-lg capitalize font-medium transition-all ${
                   activeCategory === cat
                     ? 'bg-[#FF9900]/20 text-[#FF9900] border border-[#FF9900]/40 font-semibold'
@@ -270,7 +279,10 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
             </div>
 
             <button
-              onClick={() => setIsSimulatingTraffic(!isSimulatingTraffic)}
+              onClick={() => {
+                sounds.playSwitch();
+                setIsSimulatingTraffic(!isSimulatingTraffic);
+              }}
               className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 isSimulatingTraffic
                   ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
@@ -324,7 +336,10 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
                 return (
                   <div
                     key={node.id}
-                    onClick={() => setSelectedNodeId(node.id)}
+                    onClick={() => {
+                      sounds.playClick();
+                      setSelectedNodeId(node.id);
+                    }}
                     className={`relative p-3.5 rounded-xl border transition-all duration-200 cursor-pointer ${
                       isSelected
                         ? 'bg-[#141F30] border-[#FF9900] shadow-xl shadow-[#FF9900]/15 ring-2 ring-[#FF9900]/30'
@@ -371,7 +386,10 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
                     {selectedService.name} Specification
                   </span>
                   <button 
-                    onClick={() => setSelectedNodeId(null)} 
+                    onClick={() => {
+                      sounds.playClick();
+                      setSelectedNodeId(null);
+                    }} 
                     aria-label="Close specification drawer"
                     className="text-slate-400 hover:text-white p-1 rounded-md"
                   >
@@ -408,7 +426,10 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
               {(['terraform', 'cdk', 'pulumi'] as const).map((mode) => (
                 <button
                   key={mode}
-                  onClick={() => setCodeMode(mode)}
+                  onClick={() => {
+                    sounds.playSwitch();
+                    setCodeMode(mode);
+                  }}
                   className={`px-3 py-1 rounded-lg text-xs capitalize font-semibold transition-all ${
                     codeMode === mode
                       ? 'bg-[#FF9900] text-slate-950 shadow-sm'
