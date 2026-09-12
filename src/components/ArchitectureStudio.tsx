@@ -39,6 +39,38 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
   const [copiedCode, setCopiedCode] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [isSimulatingTraffic, setIsSimulatingTraffic] = useState(true);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  const handleSaveToCloud = async () => {
+    if (nodes.length === 0) return;
+    sounds.playSuccess();
+    setSaveStatus('saving');
+    try {
+      const res = await fetch(
+        'https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com/api/architectures/save',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: currentTemplate.name,
+            components: nodes.map(n => n.serviceId),
+            complianceScore: currentTemplate.complianceScore || 0,
+            monthlyCost: currentTemplate.estimatedCost || 0
+          })
+        }
+      );
+      if (res.ok) {
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 3000);
+      } else {
+        setSaveStatus('error');
+        setTimeout(() => setSaveStatus('idle'), 3000);
+      }
+    } catch {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  };
 
   const handleSelectTemplate = (template: ArchitectureTemplate) => {
     sounds.playSwitch();
@@ -210,6 +242,30 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
           </div>
 
           <div className="flex items-center space-x-3">
+            {/* Save to Cloud — real DynamoDB write */}
+            <button
+              onClick={handleSaveToCloud}
+              disabled={saveStatus === 'saving' || nodes.length === 0}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50 ${
+                saveStatus === 'saved'
+                  ? 'bg-[#30D158]/15 text-[#30D158] border border-[#30D158]/30'
+                  : saveStatus === 'error'
+                    ? 'bg-red-500/15 text-red-400 border border-red-500/30'
+                    : 'bg-[#0A84FF]/15 text-[#0A84FF] border border-[#0A84FF]/30 hover:bg-[#0A84FF]/25'
+              }`}
+            >
+              {saveStatus === 'saving' && <span className="w-2 h-2 rounded-full bg-[#0A84FF] animate-pulse" />}
+              {saveStatus === 'saved'  && <Check className="w-3.5 h-3.5" />}
+              {saveStatus === 'error'  && <span className="w-2 h-2 rounded-full bg-red-400" />}
+              {saveStatus === 'idle'   && <Database className="w-3.5 h-3.5" />}
+              <span>
+                {saveStatus === 'saving' ? 'Saving...'
+                  : saveStatus === 'saved'  ? 'Saved to DynamoDB!'
+                  : saveStatus === 'error'  ? 'Save Failed'
+                  : 'Save to Cloud'}
+              </span>
+            </button>
+
             <button
               onClick={() => {
                 sounds.playSwitch();

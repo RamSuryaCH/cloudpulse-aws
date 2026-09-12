@@ -74,11 +74,10 @@
 | :--- | :--- | :--- | :--- |
 | **Amazon CloudFront** | CDN & Edge | Global CDN distribution with Origin Access Control (OAC) and TLS 1.3 | `d1pugni5iia6hw.cloudfront.net` |
 | **Amazon S3** | Storage | Secure Single Page Application hosting with SSE-AES256 encryption | `cloudpulse-app-frontendbucket-arswr5lhouip` |
-| **Amazon API Gateway v2** | Networking | High-speed HTTP API with CORS preflight & proxy routing | `pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com` |
-| **AWS Lambda** | Serverless Compute | Microservice handler on Graviton3 ARM64 | `cloudpulse-challenge-api` |
-| **Amazon DynamoDB** | Database | Serverless NoSQL key-value store with Point-In-Time Recovery | `cloudpulse-challenge-data` |
-| **Amazon Route 53 & ACM** | DNS & Security | Global DNS routing + Free 2048-bit SSL/TLS Certificates | Free ACM Certificates |
-| **Amazon CloudWatch** | Observability | Real-time metric alarms, latency telemetry, and log streaming | 10 custom metrics & 5 GB logs/mo |
+| **Amazon API Gateway v2** | Networking | HTTP API with CORS, proxy routing to Lambda, and 6 live routes | `pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com` |
+| **AWS Lambda** | Serverless Compute | Graviton3 ARM64 handler — DynamoDB `PutItemCommand` (save), `ScanCommand` (list/metrics), Well-Architected audit | `cloudpulse-challenge-api` |
+| **Amazon DynamoDB** | Database | Serverless NoSQL store — architecture designs persisted via `POST /api/architectures/save` and read via `GET /api/architectures` | `cloudpulse-challenge-data` |
+| **Amazon CloudWatch & X-Ray** | Observability | Real-time metric alarms, latency telemetry, distributed traces, and structured log streaming | `/aws/lambda/cloudpulse-challenge-api` |
 
 ---
 

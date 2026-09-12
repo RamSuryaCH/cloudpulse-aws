@@ -1,90 +1,122 @@
-name: CloudPulse AWS CI/CD Pipeline
+name: CloudPulse AI — CI/CD Deploy Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_REGION: ap-southeast-2
+  S3_BUCKET: cloudpulse-app-frontendbucket-arswr5lhouip
+  CF_DISTRIBUTION_ID: EJW28095DC509
+  LAMBDA_FUNCTION_NAME: cloudpulse-challenge-api
+
 jobs:
-  build-and-test:
-    name: 🧪 Lint, Test & Build
+  # ── Job 1: Lint + Type-check + Build ─────────────────────────────────────
+  build:
+    name: 🧪 Build & Type-check
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Type Check & Production Build
+      - name: TypeScript check + Vite production build
         run: npm run build
 
-      - name: Package Backend Lambda
-        run: |
-          cd backend
-          zip -r dist/lambda.zip index.js package.json
+      - name: Package Lambda (zip)
+        run: cd backend && zip -r dist/lambda.zip index.js package.json
 
-      - name: Upload Build Artifacts
+      - name: Upload frontend dist artifact
         uses: actions/upload-artifact@v4
         with:
-          name: webapp-dist
+          name: frontend-dist
           path: dist/
+          retention-days: 1
 
-  deploy-to-aws:
-    name: 🚀 Deploy to AWS (Terraform + S3 + CloudFront)
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main'
+      - name: Upload Lambda zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-zip
+          path: backend/dist/lambda.zip
+          retention-days: 1
+
+  # ── Job 2: Deploy to AWS (main branch only) ───────────────────────────────
+  deploy:
+    name: 🚀 Deploy to AWS
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Download Build Artifacts
+      - name: Download frontend dist
         uses: actions/download-artifact@v4
         with:
-          name: webapp-dist
+          name: frontend-dist
           path: dist/
 
-      - name: Configure AWS Credentials
+      - name: Download Lambda zip
+        uses: actions/download-artifact@v4
+        with:
+          name: lambda-zip
+          path: lambda/
+
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.8.0
-
-      - name: Terraform Init & Apply
+      - name: Deploy frontend → Amazon S3
         run: |
-          cd infra/terraform
-          terraform init
-          terraform apply -auto-approve
+          # Sync all assets with long-term caching
+          aws s3 sync dist/ s3://$S3_BUCKET/ \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "public, max-age=31536000, immutable" \
+            --region $AWS_REGION
 
-      - name: Sync Frontend Assets to S3
-        run: |
-          BUCKET_NAME=$(terraform -chdir=infra/terraform output -raw s3_bucket_name)
-          aws s3 sync dist/ s3://$BUCKET_NAME/ --delete --cache-control "public, max-age=31536000, immutable"
-          aws s3 cp dist/index.html s3://$BUCKET_NAME/index.html --cache-control "no-cache, no-store, must-revalidate"
+          # index.html — always revalidate
+          aws s3 cp dist/index.html s3://$S3_BUCKET/index.html \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --region $AWS_REGION
 
-      - name: Invalidate CloudFront CDN Cache
+          echo "✅ Frontend deployed to S3: $S3_BUCKET"
+
+      - name: Update Lambda function → AWS Lambda
         run: |
-          CF_DOMAIN=$(terraform -chdir=infra/terraform output -raw cloudfront_domain_name | sed 's|https://||')
-          DIST_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?DomainName=='$CF_DOMAIN'].Id" --output text)
-          if [ -n "$DIST_ID" ]; then
-            aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
-            echo "CloudFront cache invalidated for Distribution ID: $DIST_ID"
-          fi
+          aws lambda update-function-code \
+            --function-name $LAMBDA_FUNCTION_NAME \
+            --zip-file fileb://lambda/lambda.zip \
+            --region $AWS_REGION
+
+          # Wait for update to complete
+          aws lambda wait function-updated \
+            --function-name $LAMBDA_FUNCTION_NAME \
+            --region $AWS_REGION
+
+          echo "✅ Lambda deployed: $LAMBDA_FUNCTION_NAME"
+
+      - name: Invalidate CloudFront CDN cache
+        run: |
+          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+            --distribution-id $CF_DISTRIBUTION_ID \
+            --paths "/*" \
+            --query 'Invalidation.Id' \
+            --output text)
+
+          echo "✅ CloudFront invalidation created: $INVALIDATION_ID"
+          echo "🌐 Live: https://d1pugni5iia6hw.cloudfront.net"

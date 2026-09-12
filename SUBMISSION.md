@@ -1,30 +1,33 @@
-# 🏆 Weekend Challenge Submission: CloudPulse AI
+# ☁️ CloudPulse AI — Production AWS Serverless Architecture Studio
 
 ### **Project Name:** CloudPulse AI
 ### **Live URL:** https://d1pugni5iia6hw.cloudfront.net
 ### **GitHub Repo:** https://github.com/RamSuryaCH/cloudpulse-aws
+### **API Gateway:** https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com/api/health
 
 ---
 
 ### **AWS Services Used:**
-- **Amazon CloudFront**: Global Edge CDN (600+ POPs) with Origin Access Control (OAC), TLS 1.3, Brotli/Gzip compression.
-- **Amazon S3**: Static Single Page Application hosting with SSE-AES256 server-side encryption and Block Public Access (`cloudpulse-app-frontendbucket-arswr5lhouip`).
-- **Amazon API Gateway v2**: HTTP API gateway with low-latency AWS Proxy routing and built-in CORS configuration (`https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com`).
-- **AWS Lambda**: Event-driven serverless compute running on 64-bit ARM AWS Graviton3 (34% better price/performance).
-- **Amazon DynamoDB**: Serverless On-Demand NoSQL table with single-digit millisecond latency and Point-in-Time Recovery (PITR) (`cloudpulse-challenge-data`).
-- **Amazon Route 53 & ACM**: DNS routing with free automated SSL/TLS certificate management.
-- **Amazon CloudWatch & X-Ray**: Unified observability, log groups, and metric alarms for error rate monitoring.
+- **Amazon CloudFront**: Global Edge CDN (600+ POPs) with Origin Access Control (OAC), TLS 1.3, Brotli/Gzip compression. Distribution ID: `EJW28095DC509`
+- **Amazon S3**: Secure SPA hosting with SSE-AES256 and 100% Block Public Access (`cloudpulse-app-frontendbucket-arswr5lhouip`).
+- **Amazon API Gateway v2**: HTTP API with low-latency AWS Proxy routing, CORS, and 6 live routes.
+- **AWS Lambda**: Node.js 20.x on 64-bit ARM AWS Graviton3 — 34% better price/performance. Real DynamoDB reads/writes on every request.
+- **Amazon DynamoDB**: Serverless On-Demand NoSQL with PITR — stores user-saved cloud architectures (`cloudpulse-challenge-data`, PK=`ARCH#cloudpulse`).
+- **Amazon CloudWatch & X-Ray**: Unified observability, structured log groups, metric alarms, and distributed tracing.
 
 ---
 
-### **Brief Description of What You Built & How AWS Was Used:**
-CloudPulse AI is an interactive AWS Serverless Architecture Studio and Cloud Cost/Security Auditor built to empower cloud engineers to visualize, audit, and generate Infrastructure-as-Code in real-time.
+### **What Was Built & How AWS Was Used:**
 
-**Key Highlights:**
-1. 🎨 **Visual Cloud Canvas**: Drag-and-drop or select AWS building blocks to design architectures with real-time Terraform and AWS CDK code generation.
-2. 💰 **Cost & Free-Tier Guard**: Real-time cost estimator calculating monthly spend, Graviton3 savings, and alerting on free-tier consumption.
-3. 🛡️ **Well-Architected 6-Pillar Audit**: Instant compliance checklist scoring security, reliability, performance, cost, ops, and sustainability (98% Score).
-4. ⚡ **Live Serverless Telemetry Hub**: Real-time API invoker with sub-25ms latency meter and live CloudWatch structured log stream.
-5. 🚀 **Infrastructure as Code (IaC)**: 100% automated with both Terraform modules, AWS CDK (TypeScript) stacks, and CloudFormation template + GitHub Actions CI/CD pipeline!
+**CloudPulse AI** is an enterprise AWS Serverless Architecture Studio that lets engineers design, audit, and generate multi-tier cloud architectures in real time — then save them permanently to DynamoDB.
 
-**Total Monthly Cost:** **$0.00** (100% Covered by AWS Free Tier) 💸
+**Core Features:**
+1. 🎨 **Visual Cloud Canvas**: Add AWS building blocks (CloudFront, Lambda, DynamoDB, S3...) to a topology canvas. Connections auto-generate.
+2. 💰 **Cost & Free-Tier Guard**: Live cost estimator with Graviton3 savings calculations and Free Tier exhaustion alerts.
+3. 🛡️ **Well-Architected 6-Pillar Audit**: Server-side `/api/audit` scores security, reliability, performance, cost, ops, and sustainability (98% score for the current stack).
+4. ⚡ **Live Serverless Telemetry**: Real `/api/health` and `/api/metrics` API invocations hitting the live Graviton3 Lambda — sub-25ms latency visible in-app.
+5. 💾 **Save to DynamoDB**: Clicking "Save to Cloud" in the Architecture Studio POSTs to `/api/architectures/save`. Lambda writes a real `PutItemCommand` to DynamoDB. `/api/architectures` reads them back with `ScanCommand`.
+6. 🚀 **Multi-IaC Code Generation**: Real-time Terraform (HCL), AWS CDK (TypeScript), and Pulumi output for every design.
+7. 🔄 **CI/CD Pipeline**: GitHub Actions builds, deploys frontend to S3, updates Lambda code, and invalidates CloudFront on every `main` push.
+
+**Total Monthly Cost: $0.00** — 100% within AWS Free Tier.
