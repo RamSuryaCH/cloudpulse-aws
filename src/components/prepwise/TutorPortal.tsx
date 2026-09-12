@@ -5,7 +5,9 @@ import {
   BookOpen, 
   Clock, 
   Star, 
-  PlusCircle
+  PlusCircle,
+  Award,
+  Sparkles
 } from 'lucide-react';
 import { SEED_TUTORS, SEED_SESSIONS, COURSE_SUBJECTS } from '../../data/prepwiseData';
 import type { TutoringSession, TutorProfile } from '../../types/prepwise';
@@ -75,9 +77,8 @@ export const TutorPortal: React.FC = () => {
     }));
   };
 
-  const availableVerifiedJobs = sessions.filter(s => s.paymentStatus === 'verified' && s.sessionStatus === 'unassigned');
+  const availableVerifiedJobs = sessions.filter(s => s.sessionStatus === 'requested');
   const myAssignedJobs = sessions.filter(s => s.tutorId === activeTutor.id);
-  const totalEarned = myAssignedJobs.filter(s => s.sessionStatus === 'completed').reduce((sum, s) => sum + s.tutorEarnings, 0);
 
   return (
     <div className="space-y-12">
@@ -86,13 +87,13 @@ export const TutorPortal: React.FC = () => {
         <div className="space-y-3 max-w-3xl">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#30D158]/10 border border-[#30D158]/30 text-[#30D158] text-xs font-mono font-semibold">
             <UserCheck className="w-3.5 h-3.5" />
-            <span>Single 25% Platform Fee • Tutors Keep 75%</span>
+            <span>Campus Volunteer Peer Tutors & Senior TAs</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Campus Tutor Portal
+            Peer Tutor Portal
           </h1>
           <p className="text-base text-slate-400 leading-relaxed">
-            Accept verified student sessions on your campus, conduct 1-on-1 exam prep, and receive 75% take-home payouts directly to your UPI.
+            Conduct 1-on-1 exam prep and group study sessions on your campus. Earn academic Karma points, volunteer hours recognition, and campus leadership badges.
           </p>
         </div>
 
@@ -101,18 +102,18 @@ export const TutorPortal: React.FC = () => {
             sounds.playClick();
             setIsApplyModalOpen(true);
           }}
-          className="flex items-center space-x-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-black font-extrabold text-xs shadow-xl shadow-[#F59E0B]/20 transition-all active:scale-95 duration-150 cursor-pointer shrink-0"
+          className="flex items-center space-x-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#30D158] to-[#10B981] text-black font-extrabold text-xs shadow-xl shadow-[#30D158]/20 transition-all active:scale-95 duration-150 cursor-pointer shrink-0"
         >
           <PlusCircle className="w-4 h-4 stroke-[2.5]" />
-          <span>Apply to Become a Tutor</span>
+          <span>Apply to Become a Peer Tutor</span>
         </button>
       </div>
 
       {/* Tutor Profile Summary Card */}
-      <div className="apple-card p-8 bg-[#050508] border-2 border-[#F59E0B]/30">
+      <div className="apple-card p-8 bg-[#050508] border-2 border-[#30D158]/30">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
           <div className="flex items-center space-x-4">
-            <div className="w-14 h-14 rounded-2xl bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/40 flex items-center justify-center font-black text-xl">
+            <div className="w-14 h-14 rounded-2xl bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/40 flex items-center justify-center font-black text-xl">
               {activeTutor.name[0]}
             </div>
             <div>
@@ -122,15 +123,19 @@ export const TutorPortal: React.FC = () => {
           </div>
 
           <div className="font-mono text-xs space-y-1">
-            <span className="text-slate-400 uppercase tracking-wider text-[10px] block">Take-Home Rate</span>
-            <span className="text-lg font-bold text-[#30D158]">75% Commission Keep</span>
-            <span className="text-slate-400 text-[11px] block">No hidden monthly fees</span>
+            <span className="text-slate-400 uppercase tracking-wider text-[10px] block">Volunteer Recognition</span>
+            <span className="text-lg font-bold text-[#30D158] flex items-center gap-1">
+              <Award className="w-4 h-4" /> {activeTutor.volunteerHours} Hours
+            </span>
+            <span className="text-slate-400 text-[11px] block">Verified Academic Credit</span>
           </div>
 
           <div className="font-mono text-xs space-y-1">
-            <span className="text-slate-400 uppercase tracking-wider text-[10px] block">Total Earnings</span>
-            <span className="text-lg font-bold text-[#F59E0B]">₹{totalEarned.toFixed(2)}</span>
-            <span className="text-slate-400 text-[11px] block">Direct UPI Transfer</span>
+            <span className="text-slate-400 uppercase tracking-wider text-[10px] block">Karma Points</span>
+            <span className="text-lg font-bold text-[#0A84FF] flex items-center gap-1">
+              <Sparkles className="w-4 h-4" /> {activeTutor.karmaPoints} PTS
+            </span>
+            <span className="text-slate-400 text-[11px] block">Top Campus Ranker</span>
           </div>
 
           <div className="font-mono text-xs space-y-1">
@@ -139,7 +144,7 @@ export const TutorPortal: React.FC = () => {
               <Star className="w-4 h-4 fill-current text-[#F59E0B]" />
               <span>{activeTutor.rating} / 5.0</span>
             </div>
-            <span className="text-slate-400 text-[11px] block">18 Completed Sessions</span>
+            <span className="text-slate-400 text-[11px] block">{activeTutor.totalSessionsCompleted} Completed Sessions</span>
           </div>
         </div>
       </div>
@@ -147,13 +152,13 @@ export const TutorPortal: React.FC = () => {
       {/* Workspaces Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Column: Available Verified Jobs Queue (7 cols) */}
+        {/* Left Column: Requested Sessions Queue (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
           <div className="apple-card p-8 space-y-6">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2.5 font-mono">
-                <BookOpen className="w-5 h-5 text-[#F59E0B]" />
-                Available Verified Sessions Queue
+                <BookOpen className="w-5 h-5 text-[#30D158]" />
+                Requested Free Peer Sessions Queue
               </h3>
               <span className="text-xs text-[#30D158] font-mono font-bold bg-[#30D158]/10 px-2.5 py-0.5 rounded-full border border-[#30D158]/30">
                 {availableVerifiedJobs.length} Available
@@ -162,7 +167,7 @@ export const TutorPortal: React.FC = () => {
 
             {availableVerifiedJobs.length === 0 ? (
               <div className="p-8 text-center text-slate-400 font-mono text-xs">
-                No unassigned verified jobs currently in the queue. New student bookings appear here after admin payment check.
+                No unassigned session requests currently in the queue. New student requests will appear here instantly.
               </div>
             ) : (
               <div className="space-y-4">
@@ -174,7 +179,7 @@ export const TutorPortal: React.FC = () => {
                         <span className="text-xs font-mono text-slate-400 block">{job.studentName} • {job.collegeName}</span>
                       </div>
                       <span className="text-sm font-mono font-black text-[#30D158] bg-[#30D158]/10 px-3 py-1 rounded-full border border-[#30D158]/30">
-                        ₹{job.tutorEarnings} (75%)
+                        FREE
                       </span>
                     </div>
 
@@ -182,9 +187,9 @@ export const TutorPortal: React.FC = () => {
                       <span>Format: <strong className="text-white capitalize">{job.sessionType.replace('_', ' ')}</strong></span>
                       <button
                         onClick={() => handleAcceptJob(job.id)}
-                        className="px-4 py-2 rounded-xl bg-[#F59E0B] hover:bg-[#FBBF24] text-black font-extrabold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-[#30D158] hover:bg-[#34D399] text-black font-extrabold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
                       >
-                        Accept Session
+                        Accept Session Request
                       </button>
                     </div>
                   </div>
@@ -210,7 +215,7 @@ export const TutorPortal: React.FC = () => {
                 <div key={job.id} className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] space-y-3">
                   <div className="flex justify-between items-start">
                     <span className="font-bold text-sm text-white">{job.courseName}</span>
-                    <span className="text-xs font-mono text-[#F59E0B] font-bold">₹{job.tutorEarnings}</span>
+                    <span className="text-xs font-mono text-[#30D158] font-bold">FREE</span>
                   </div>
 
                   <div className="text-xs font-mono text-slate-400 space-y-1">
@@ -236,11 +241,11 @@ export const TutorPortal: React.FC = () => {
       {/* Become a Tutor Application Modal */}
       {isApplyModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="apple-card max-w-lg w-full p-8 space-y-6 relative border-2 border-[#F59E0B]/40">
+          <div className="apple-card max-w-lg w-full p-8 space-y-6 relative border-2 border-[#30D158]/40">
             <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
-              <h3 className="text-lg font-black text-white">Tutor Application</h3>
+              <h3 className="text-lg font-black text-white">Peer Tutor Application</h3>
               <span className="text-xs font-mono text-[#30D158] bg-[#30D158]/10 px-3 py-1 rounded-full border border-[#30D158]/30 font-bold">
-                75% Take-Home Rate
+                Volunteer Community Role
               </span>
             </div>
 
@@ -248,7 +253,7 @@ export const TutorPortal: React.FC = () => {
               <div className="py-8 text-center space-y-3">
                 <CheckCircle2 className="w-12 h-12 text-[#30D158] mx-auto" />
                 <h4 className="text-xl font-bold text-white">Application Submitted!</h4>
-                <p className="text-xs text-slate-300 font-mono">Our campus admin will review your GPA and subject expertise within 24 hours.</p>
+                <p className="text-xs text-slate-300 font-mono">Our campus coordinator will review your GPA and subject expertise within 24 hours.</p>
               </div>
             ) : (
               <div className="space-y-4 text-xs font-mono">
@@ -259,7 +264,7 @@ export const TutorPortal: React.FC = () => {
                     placeholder="e.g. Arjun Reddy"
                     value={applicantName}
                     onChange={(e) => setApplicantName(e.target.value)}
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"
+                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
                   />
                 </div>
 
@@ -271,7 +276,7 @@ export const TutorPortal: React.FC = () => {
                       placeholder="arjun@student.vnrvjiet.ac.in"
                       value={applicantEmail}
                       onChange={(e) => setApplicantEmail(e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
                     />
                   </div>
                   <div>
@@ -281,19 +286,19 @@ export const TutorPortal: React.FC = () => {
                       placeholder="+91 98490 12345"
                       value={applicantPhone}
                       onChange={(e) => setApplicantPhone(e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-slate-300 block mb-1">College & Branch</label>
+                    <label className="text-slate-300 block mb-1">College Campus</label>
                     <input
                       type="text"
                       value={applicantCollege}
                       onChange={(e) => setApplicantCollege(e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
                     />
                   </div>
                   <div>
@@ -302,7 +307,7 @@ export const TutorPortal: React.FC = () => {
                       type="text"
                       value={applicantGpa}
                       onChange={(e) => setApplicantGpa(e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
                     />
                   </div>
                 </div>
@@ -319,7 +324,7 @@ export const TutorPortal: React.FC = () => {
                           onClick={() => handleToggleSubject(sub.id)}
                           className={`p-2.5 rounded-xl border text-[11px] text-left transition-all ${
                             isSel
-                              ? 'bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]'
+                              ? 'bg-[#30D158]/20 text-[#30D158] border-[#30D158]'
                               : 'bg-white/[0.04] text-slate-400 border-white/[0.08]'
                           }`}
                         >
@@ -339,9 +344,9 @@ export const TutorPortal: React.FC = () => {
                   </button>
                   <button
                     onClick={handleApplySubmit}
-                    className="flex-1 py-3 rounded-xl bg-[#F59E0B] text-black font-extrabold shadow-lg"
+                    className="flex-1 py-3 rounded-xl bg-[#30D158] text-black font-extrabold shadow-lg"
                   >
-                    Submit Tutor Application
+                    Submit Peer Application
                   </button>
                 </div>
               </div>

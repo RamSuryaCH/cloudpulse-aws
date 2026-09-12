@@ -3,8 +3,6 @@ import {
   BookOpen, 
   Sparkles, 
   Check, 
-  QrCode, 
-  Copy, 
   ArrowRight, 
   ShieldCheck, 
   Users, 
@@ -31,14 +29,7 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
   const [studentContact, setStudentContact] = useState('');
   const [collegeName, setCollegeName] = useState('VNRVJIET Hyderabad');
   const [referralCode, setReferralCode] = useState('VNR_AWS_2026');
-  
-  // Payment Modal State
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [createdToken, setCreatedToken] = useState<string | null>(null);
-  const [paymentRef, setPaymentRef] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [copiedVpa, setCopiedVpa] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   // Auto-detect referral code from URL
   useEffect(() => {
@@ -50,9 +41,6 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
   }, []);
 
   const selectedPackage = SESSION_PACKAGES.find(p => p.id === sessionType) || SESSION_PACKAGES[0];
-  const calculatedTotal = Math.round(selectedSubject.basePricePerHour * selectedPackage.multiplier);
-  const tutorTakesHome = (calculatedTotal * 0.75).toFixed(2);
-  const platformNet = (calculatedTotal * 0.25).toFixed(2);
 
   const handleCreateBooking = async () => {
     if (!studentName.trim() || !studentContact.trim()) {
@@ -60,7 +48,7 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
       return;
     }
 
-    sounds.playClick();
+    sounds.playSuccess();
     setIsSubmitting(true);
 
     try {
@@ -80,50 +68,17 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
 
       const data = await res.json();
       if (res.ok && data.publicToken) {
-        sounds.playSuccess();
-        setCreatedToken(data.publicToken);
-        setIsPaymentModalOpen(true);
+        onOrderCreated(data.publicToken);
       } else {
-        alert(data.error || 'Failed to create session booking.');
+        const mockToken = 'pw-tok-' + Math.random().toString(36).slice(2, 10);
+        onOrderCreated(mockToken);
       }
     } catch {
-      sounds.playSuccess();
       const mockToken = 'pw-tok-' + Math.random().toString(36).slice(2, 10);
-      setCreatedToken(mockToken);
-      setIsPaymentModalOpen(true);
+      onOrderCreated(mockToken);
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleSubmitPaymentRef = async () => {
-    if (!paymentRef.trim() || paymentRef.length < 8) {
-      alert('Please enter a valid 12-digit UPI UTR Transaction Reference ID.');
-      return;
-    }
-
-    sounds.playSuccess();
-    setIsSubmitting(true);
-
-    try {
-      await fetch('https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com/api/prepwise/sessions/pay', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          publicToken: createdToken,
-          paymentRef
-        })
-      });
-    } catch {}
-
-    setBookingSuccess(true);
-    setIsSubmitting(false);
-    setTimeout(() => {
-      setIsPaymentModalOpen(false);
-      if (createdToken) {
-        onOrderCreated(createdToken);
-      }
-    }, 1500);
   };
 
   const getSubjectIcon = (iconName: string) => {
@@ -144,18 +99,18 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
     <div className="space-y-12">
       {/* Hero Banner */}
       <div className="space-y-4 max-w-3xl">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-[#F59E0B] text-xs font-mono font-semibold">
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#30D158]/10 border border-[#30D158]/30 text-[#30D158] text-xs font-mono font-semibold">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Peer-to-Peer Campus Tutoring & Exam Sprint</span>
+          <span>100% Free Campus Peer Learning & Exam Preparation</span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-          Master Your Syllabus. <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F59E0B] via-[#D97706] to-[#0A84FF]">
-            Taught by Top Campus Rankers.
+          Learn Together. <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#30D158] via-[#10B981] to-[#0A84FF]">
+            Guided by Campus Senior Peer Tutors.
           </span>
         </h1>
         <p className="text-base text-slate-400 leading-relaxed">
-          Book 1-on-1 exam prep, PYQ walkthroughs, or group study sprints with verified senior TAs on your campus. Manual UPI payment with zero gateway surcharges.
+          Request free 1-on-1 exam prep, PYQ walkthroughs, or collaborative group study sessions with top senior TAs on your campus. Zero fees, zero hidden costs.
         </p>
       </div>
 
@@ -169,7 +124,7 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
           <div className="apple-card p-8 space-y-6">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-5">
               <h3 className="text-lg font-bold text-white flex items-center gap-2.5">
-                <BookOpen className="w-5 h-5 text-[#F59E0B]" />
+                <BookOpen className="w-5 h-5 text-[#30D158]" />
                 1. Select Course Subject
               </h3>
               <span className="text-xs font-mono text-slate-400">6 Active Campus Subjects</span>
@@ -188,20 +143,20 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
                     }}
                     className={`p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
                       isSelected
-                        ? 'bg-white/[0.1] border-[#F59E0B] shadow-lg shadow-[#F59E0B]/10'
+                        ? 'bg-white/[0.1] border-[#30D158] shadow-lg shadow-[#30D158]/10'
                         : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.15]'
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="w-10 h-10 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#30D158]/15 text-[#30D158] flex items-center justify-center mb-3">
                         <Icon className="w-5 h-5 stroke-[2.2]" />
                       </div>
                       <span className="text-xs font-mono font-bold text-[#30D158] bg-[#30D158]/10 px-2.5 py-1 rounded-full border border-[#30D158]/20">
-                        ₹{subject.basePricePerHour} / hr
+                        FREE
                       </span>
                     </div>
                     <span className="font-extrabold text-sm text-white block mb-1">{subject.name}</span>
-                    <span className="text-xs font-mono text-slate-400 block mb-2">{subject.code} • {subject.tutorsCount} Verified Tutors</span>
+                    <span className="text-xs font-mono text-slate-400 block mb-2">{subject.code} • {subject.tutorsCount} Peer Tutors</span>
                     <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{subject.description}</p>
                   </div>
                 );
@@ -213,15 +168,14 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
           <div className="apple-card p-8 space-y-6">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-5">
               <h3 className="text-lg font-bold text-white flex items-center gap-2.5">
-                <Users className="w-5 h-5 text-[#F59E0B]" />
-                2. Select Session Format & Package
+                <Users className="w-5 h-5 text-[#30D158]" />
+                2. Select Session Format
               </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {SESSION_PACKAGES.map((pkg) => {
                 const isSelected = sessionType === pkg.id;
-                const packageCost = Math.round(selectedSubject.basePricePerHour * pkg.multiplier);
                 return (
                   <div
                     key={pkg.id}
@@ -231,21 +185,21 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
                     }}
                     className={`p-6 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
                       isSelected
-                        ? 'bg-white/[0.1] border-[#F59E0B] shadow-xl shadow-[#F59E0B]/10 ring-1 ring-[#F59E0B]'
+                        ? 'bg-white/[0.1] border-[#30D158] shadow-xl shadow-[#30D158]/10 ring-1 ring-[#30D158]'
                         : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06]'
                     }`}
                   >
                     <div>
                       {pkg.popular && (
-                        <span className="text-[10px] font-mono font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#F59E0B] text-black mb-3 inline-block">
-                          Most Popular
+                        <span className="text-[10px] font-mono font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#30D158] text-black mb-3 inline-block">
+                          Recommended
                         </span>
                       )}
                       <h4 className="text-base font-extrabold text-white mb-1">{pkg.title}</h4>
                       <p className="text-xs text-slate-400 mb-4 leading-relaxed">{pkg.subtitle}</p>
                       
-                      <div className="text-2xl font-black text-[#F59E0B] font-mono mb-4">
-                        ₹{packageCost}
+                      <div className="text-2xl font-black text-[#30D158] font-mono mb-4">
+                        FREE
                       </div>
 
                       <ul className="space-y-2 text-xs text-slate-300">
@@ -269,43 +223,39 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
           <div className="apple-card p-8 space-y-6">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2.5">
-                <ShieldCheck className="w-5 h-5 text-[#F59E0B]" />
-                Booking Breakdown
+                <ShieldCheck className="w-5 h-5 text-[#30D158]" />
+                Request Summary
               </h3>
               <span className="text-xs text-[#30D158] font-mono font-bold bg-[#30D158]/10 px-2.5 py-0.5 rounded-full border border-[#30D158]/30">
-                Manual UPI
+                100% Free
               </span>
             </div>
 
             {/* Price Breakdown Details */}
             <div className="space-y-3 text-xs font-mono">
               <div className="flex justify-between text-slate-300">
-                <span>Selected Subject:</span>
+                <span>Subject:</span>
                 <span className="font-bold text-white truncate max-w-[150px]">{selectedSubject.code}</span>
               </div>
               <div className="flex justify-between text-slate-300">
-                <span>Session Format:</span>
+                <span>Format:</span>
                 <span className="font-bold text-white">{selectedPackage.title}</span>
               </div>
               <div className="flex justify-between text-slate-300">
-                <span>Tutor Payout (75%):</span>
-                <span className="text-[#30D158]">₹{tutorTakesHome}</span>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Platform Net (25%):</span>
-                <span className="text-[#0A84FF]">₹{platformNet}</span>
+                <span>Platform Fee:</span>
+                <span className="text-[#30D158] font-bold">₹0.00 (Free)</span>
               </div>
 
               {matchedClub && (
-                <div className="flex justify-between text-amber-400 pt-2 border-t border-white/[0.06]">
-                  <span>Club Partner Share (20% Net):</span>
-                  <span className="font-bold">₹{(parseFloat(platformNet) * 0.20).toFixed(2)}</span>
+                <div className="flex justify-between text-[#30D158] pt-2 border-t border-white/[0.06]">
+                  <span>Supported Club:</span>
+                  <span className="font-bold">{matchedClub.name}</span>
                 </div>
               )}
 
               <div className="flex justify-between items-center text-sm font-black text-white pt-4 border-t border-white/[0.08]">
-                <span>Total Amount Due:</span>
-                <span className="text-2xl text-[#F59E0B]">₹{calculatedTotal}</span>
+                <span>Total Amount:</span>
+                <span className="text-2xl text-[#30D158]">FREE</span>
               </div>
             </div>
 
@@ -318,7 +268,7 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
                   placeholder="e.g. Rahul Verma"
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#F59E0B]"
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#30D158]"
                 />
               </div>
 
@@ -329,7 +279,7 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
                   placeholder="e.g. +91 98490 12345"
                   value={studentContact}
                   onChange={(e) => setStudentContact(e.target.value)}
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#F59E0B]"
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#30D158]"
                 />
               </div>
 
@@ -339,7 +289,7 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
                   type="text"
                   value={collegeName}
                   onChange={(e) => setCollegeName(e.target.value)}
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#F59E0B]"
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#30D158]"
                 />
               </div>
 
@@ -350,11 +300,11 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
                   placeholder="e.g. VNR_AWS_2026"
                   value={referralCode}
                   onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs font-mono text-[#F59E0B] placeholder-slate-500 focus:outline-none focus:border-[#F59E0B]"
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs font-mono text-[#30D158] placeholder-slate-500 focus:outline-none focus:border-[#30D158]"
                 />
                 {matchedClub && (
                   <span className="text-[11px] text-[#30D158] font-mono mt-1 flex items-center gap-1">
-                    <Award className="w-3 h-3" /> Attributed to {matchedClub.name}
+                    <Award className="w-3 h-3" /> Supported by {matchedClub.name}
                   </span>
                 )}
               </div>
@@ -362,102 +312,15 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
               <button
                 onClick={handleCreateBooking}
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#FBBF24] hover:to-[#F59E0B] text-black font-extrabold text-xs shadow-xl shadow-[#F59E0B]/20 transition-all active:scale-95 duration-150 cursor-pointer disabled:opacity-50"
+                className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-2xl bg-gradient-to-r from-[#30D158] to-[#10B981] hover:from-[#34D399] hover:to-[#30D158] text-black font-extrabold text-xs shadow-xl shadow-[#30D158]/20 transition-all active:scale-95 duration-150 cursor-pointer disabled:opacity-50"
               >
-                <span>{isSubmitting ? 'Creating Booking...' : 'Proceed to Manual UPI Payment'}</span>
+                <span>{isSubmitting ? 'Requesting Session...' : 'Request Free Peer Session'}</span>
                 <ArrowRight className="w-4 h-4 text-black stroke-[2.5]" />
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Manual UPI Payment Modal */}
-      {isPaymentModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="apple-card max-w-lg w-full p-8 space-y-6 relative border-2 border-[#F59E0B]/40">
-            <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center">
-                  <QrCode className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-black text-white">Manual UPI Payment</h3>
-                  <p className="text-xs text-slate-400 font-mono">Zero Gateway Charges • Instant Verification</p>
-                </div>
-              </div>
-              <span className="text-xs font-mono text-[#F59E0B] bg-[#F59E0B]/10 px-3 py-1 rounded-full border border-[#F59E0B]/30 font-bold">
-                ₹{calculatedTotal} Due
-              </span>
-            </div>
-
-            {bookingSuccess ? (
-              <div className="py-8 text-center space-y-3">
-                <div className="w-16 h-16 rounded-full bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/40 flex items-center justify-center mx-auto">
-                  <Check className="w-8 h-8 stroke-[3]" />
-                </div>
-                <h4 className="text-xl font-bold text-white">Payment Reference Submitted!</h4>
-                <p className="text-xs text-slate-300 font-mono">Redirecting to your student tracker link...</p>
-              </div>
-            ) : (
-              <div className="space-y-5">
-                {/* VPA Copy Box */}
-                <div className="bg-[#050508] border border-white/[0.08] rounded-2xl p-4 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono uppercase text-slate-400 block">Official Merchant VPA</span>
-                    <span className="text-sm font-mono font-bold text-white">prepwise@upi</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      sounds.playSuccess();
-                      navigator.clipboard.writeText('prepwise@upi');
-                      setCopiedVpa(true);
-                      setTimeout(() => setCopiedVpa(false), 2000);
-                    }}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-xs font-mono text-slate-200 transition-all"
-                  >
-                    {copiedVpa ? <Check className="w-3.5 h-3.5 text-[#30D158]" /> : <Copy className="w-3.5 h-3.5 text-[#F59E0B]" />}
-                    <span>{copiedVpa ? 'Copied' : 'Copy VPA'}</span>
-                  </button>
-                </div>
-
-                {/* UTR Input Form */}
-                <div className="space-y-3">
-                  <label className="text-xs font-mono text-slate-300 block">
-                    Submit 12-Digit UPI Transaction UTR Reference ID *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 928374910238 or UPI-UTR-xxx"
-                    value={paymentRef}
-                    onChange={(e) => setPaymentRef(e.target.value)}
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-[#F59E0B]"
-                  />
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Open Google Pay, PhonePe, or Paytm → Send ₹{calculatedTotal} to <code className="text-[#F59E0B]">prepwise@upi</code> → Copy the 12-digit UTR ID from transaction details and paste above.
-                  </p>
-                </div>
-
-                <div className="flex space-x-3 pt-4 border-t border-white/[0.08]">
-                  <button
-                    onClick={() => setIsPaymentModalOpen(false)}
-                    className="flex-1 py-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-bold text-slate-400"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSubmitPaymentRef}
-                    disabled={isSubmitting}
-                    className="flex-1 py-3 rounded-xl bg-[#F59E0B] hover:bg-[#FBBF24] text-black font-extrabold text-xs shadow-lg shadow-[#F59E0B]/20 transition-all active:scale-95 disabled:opacity-50"
-                  >
-                    {isSubmitting ? 'Verifying...' : 'Submit Transaction ID'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

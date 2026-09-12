@@ -6,7 +6,6 @@ export const COURSE_SUBJECTS: CourseSubject[] = [
     name: 'Engineering Mathematics III (PDE & Complex Variables)',
     code: 'MA301',
     category: 'engineering',
-    basePricePerHour: 299,
     tutorsCount: 14,
     icon: 'Calculator',
     description: 'Partial differential equations, Fourier transforms, complex integration, and residue calculus.'
@@ -16,7 +15,6 @@ export const COURSE_SUBJECTS: CourseSubject[] = [
     name: 'Data Structures & Algorithms in C++/Java',
     code: 'CS201',
     category: 'computer_science',
-    basePricePerHour: 349,
     tutorsCount: 22,
     icon: 'Code2',
     description: 'Trees, Graphs, Dynamic Programming, Heap sort, Time complexity proofs, and lab exam solutions.'
@@ -26,7 +24,6 @@ export const COURSE_SUBJECTS: CourseSubject[] = [
     name: 'Digital Logic & Microprocessors (8086/ARM)',
     code: 'EC204',
     category: 'electronics',
-    basePricePerHour: 299,
     tutorsCount: 11,
     icon: 'Cpu',
     description: 'K-Maps, Combinational circuits, Assembly programming, timing diagrams, and lab simulator walkthroughs.'
@@ -36,7 +33,6 @@ export const COURSE_SUBJECTS: CourseSubject[] = [
     name: 'Database Management Systems & SQL Querying',
     code: 'CS302',
     category: 'computer_science',
-    basePricePerHour: 279,
     tutorsCount: 18,
     icon: 'Database',
     description: 'Relational algebra, ER diagrams, B+ Trees, 3NF/BCNF normalization, and complex JOIN queries.'
@@ -46,7 +42,6 @@ export const COURSE_SUBJECTS: CourseSubject[] = [
     name: 'Operating Systems & System Programming',
     code: 'CS304',
     category: 'computer_science',
-    basePricePerHour: 319,
     tutorsCount: 15,
     icon: 'Terminal',
     description: 'Process synchronization, Semaphores, Page replacement algorithms, and POSIX thread coding.'
@@ -56,7 +51,6 @@ export const COURSE_SUBJECTS: CourseSubject[] = [
     name: 'Engineering Chemistry & Spectroscopy',
     code: 'CH101',
     category: 'basic_sciences',
-    basePricePerHour: 249,
     tutorsCount: 9,
     icon: 'FlaskConical',
     description: 'NMR Spectroscopy, Phase rule, Reaction kinetics, Water treatment calculations, and lab viva prep.'
@@ -66,42 +60,39 @@ export const COURSE_SUBJECTS: CourseSubject[] = [
 export const SESSION_PACKAGES: SessionPackage[] = [
   {
     id: 'one_on_one',
-    title: '1-on-1 Exam Sprint',
-    subtitle: 'Direct peer tutoring tailored to your exact syllabus & weak spots',
-    multiplier: 1.0,
-    basePrice: 299,
+    title: '1-on-1 Peer Exam Sprint',
+    subtitle: 'Direct peer tutoring tailored to your exact syllabus & weak spots (100% Free)',
     popular: true,
     features: [
       '60 Minutes 1-on-1 Live Campus / Online Session',
       'Previous Year Questions (PYQs) Solved',
       'Custom Formula & Code Cheat Sheets Included',
-      'Direct WhatsApp Follow-up Support'
+      'Direct WhatsApp Peer Study Support',
+      '100% Free — No Hidden Fees or Charges'
     ]
   },
   {
     id: 'group_sprint',
-    title: 'Group Study Sprint (3-5 Students)',
-    subtitle: 'Study together with classmates and split the cost',
-    multiplier: 0.6,
-    basePrice: 149,
+    title: 'Group Study Circle (3-5 Students)',
+    subtitle: 'Study together with classmates and solve exam problems as a group',
     features: [
-      '90 Minutes Interactive Group Session',
-      'Shared PYQ Problem Solving',
-      'Lab Exam / Viva Question Bank',
-      'Per-Student Discounted Rate'
+      '90 Minutes Interactive Group Peer Session',
+      'Shared PYQ Problem Solving & Discussion',
+      'Lab Exam & Viva Question Bank Walkthrough',
+      'Open Collaborative Campus Study',
+      '100% Free Community Event'
     ]
   },
   {
     id: 'subject_mastery',
-    title: 'Complete Exam Mastery Pack',
-    subtitle: 'Full unit walkthrough + 3 mock exam review sessions',
-    multiplier: 2.2,
-    basePrice: 649,
+    title: 'Complete Unit Review Workshop',
+    subtitle: 'Full unit walkthrough + 3 mock exam review sessions with senior TAs',
     features: [
-      '3 x 60-Min Intensive Sessions',
+      '3 x 60-Min Intensive Peer Sessions',
       'End-to-End Syllabus Coverage',
-      'Guaranteed Passing / Top-Grade Roadmap',
-      'Handwritten Notes & Diagrams Archive'
+      'Passing & Top-Grade Preparation Roadmap',
+      'Handwritten Notes & Diagrams Archive Access',
+      '100% Free Campus Initiative'
     ]
   }
 ];
@@ -112,45 +103,30 @@ export const SEED_CLUBS: PartnerClub[] = [
     name: 'AWS Cloud Club VNRVJIET',
     collegeName: 'VNR Vignana Jyothi Institute of Tech',
     referralCode: 'VNR_AWS_2026',
-    sharePercent: 20,
-    totalAttributedOrders: 18,
-    totalGmv: 5382,
-    totalNetEarned: 269.1,
-    totalPaid: 200,
-    payableBalance: 69.1,
-    payeeName: 'Karthik Rao (President)',
-    payeeContact: '+91 98490 12345',
-    payeeUpi: 'karthik.vnr@upi'
+    totalAttributedSessions: 28,
+    totalStudentsHelped: 84,
+    leadName: 'Karthik Rao (President)',
+    leadContact: '+91 98490 12345'
   },
   {
     id: 'club-cbit-csi',
     name: 'CSI Student Chapter CBIT',
     collegeName: 'Chaitanya Bharathi Institute of Tech',
     referralCode: 'CBIT_CSI_PREP',
-    sharePercent: 20,
-    totalAttributedOrders: 24,
-    totalGmv: 7176,
-    totalNetEarned: 358.8,
-    totalPaid: 300,
-    payableBalance: 58.8,
-    payeeName: 'Ananya Sharma (Treasurer)',
-    payeeContact: '+91 97012 34567',
-    payeeUpi: 'ananya.cbit@upi'
+    totalAttributedSessions: 36,
+    totalStudentsHelped: 112,
+    leadName: 'Ananya Sharma (Chair)',
+    leadContact: '+91 97012 34567'
   },
   {
     id: 'club-mjcet-ieee',
     name: 'IEEE Student Branch MJCET',
     collegeName: 'Muffakham Jah College of Engg',
     referralCode: 'MJCET_IEEE_PRO',
-    sharePercent: 20,
-    totalAttributedOrders: 12,
-    totalGmv: 3588,
-    totalNetEarned: 179.4,
-    totalPaid: 150,
-    payableBalance: 29.4,
-    payeeName: 'Mohammed Ahmed (Chair)',
-    payeeContact: '+91 91234 56789',
-    payeeUpi: 'ahmed.mjcet@upi'
+    totalAttributedSessions: 19,
+    totalStudentsHelped: 57,
+    leadName: 'Mohammed Ahmed (Chair)',
+    leadContact: '+91 91234 56789'
   }
 ];
 
@@ -165,9 +141,8 @@ export const SEED_TUTORS: TutorProfile[] = [
     major: 'Computer Science & Engg (4th Year)',
     gpa: 9.4,
     subjectsHandled: ['dsa', 'operating-systems', 'dbms'],
-    hourlyRate: 349,
-    totalEarned: 4710,
-    payableBalance: 785,
+    volunteerHours: 32,
+    karmaPoints: 480,
     totalSessionsCompleted: 18,
     rating: 4.9,
     status: 'approved',
@@ -183,9 +158,8 @@ export const SEED_TUTORS: TutorProfile[] = [
     major: 'Electronics & Comm Engg (3rd Year)',
     gpa: 9.6,
     subjectsHandled: ['eng-maths-3', 'digital-electronics'],
-    hourlyRate: 299,
-    totalEarned: 3588,
-    payableBalance: 672,
+    volunteerHours: 26,
+    karmaPoints: 390,
     totalSessionsCompleted: 14,
     rating: 4.95,
     status: 'approved',
@@ -204,14 +178,7 @@ export const SEED_SESSIONS: TutoringSession[] = [
     courseName: 'Data Structures & Algorithms in C++/Java',
     sessionType: 'one_on_one',
     durationMins: 60,
-    totalAmount: 349,
-    tutorEarnings: 261.75,
-    platformNet: 87.25,
-    partnerClubShare: 17.45,
-    paymentStatus: 'verified',
-    paymentRef: 'UPI-UTR-928374910238',
-    verifiedBy: 'Admin (System)',
-    verifiedAt: '2026-09-12T10:00:00.000Z',
+    isFree: true,
     tutorId: 'tutor-1',
     tutorName: 'Arjun Reddy',
     sessionStatus: 'completed',
@@ -232,14 +199,7 @@ export const SEED_SESSIONS: TutoringSession[] = [
     courseName: 'Engineering Mathematics III (PDE & Complex Variables)',
     sessionType: 'group_sprint',
     durationMins: 90,
-    totalAmount: 299,
-    tutorEarnings: 224.25,
-    platformNet: 74.75,
-    partnerClubShare: 14.95,
-    paymentStatus: 'verified',
-    paymentRef: 'UPI-UTR-882347109283',
-    verifiedBy: 'Admin (System)',
-    verifiedAt: '2026-09-12T12:00:00.000Z',
+    isFree: true,
     tutorId: 'tutor-2',
     tutorName: 'Sneha Kulkarni',
     sessionStatus: 'ready',
