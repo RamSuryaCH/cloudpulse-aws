@@ -1,0 +1,21 @@
+{
+  "name": "cloudpulse-cdk",
+  "version": "1.0.0",
+  "bin": {
+    "cloudpulse-cdk": "bin/cloudpulse.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "aws-cdk": "^2.130.0",
+    "typescript": "~5.3.3"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.130.0",
+    "constructs": "^10.3.0"
+  }
+}
