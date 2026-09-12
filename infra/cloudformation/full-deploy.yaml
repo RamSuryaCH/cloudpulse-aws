@@ -1,0 +1,260 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudPulse AI - Full Stack Serverless Web App on AWS
+
+Parameters:
+  AppName:
+    Type: String
+    Default: cloudpulse-challenge
+
+Resources:
+  # ----------------------------------------------------------------------
+  # 1. Amazon S3 Static Website Bucket
+  # ----------------------------------------------------------------------
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # ----------------------------------------------------------------------
+  # 2. Amazon CloudFront Origin Access Control (OAC) & Distribution
+  # ----------------------------------------------------------------------
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${AppName}-oac-${AWS::AccountId}"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        PriceClass: PriceClass_100
+        Comment: CloudPulse AI Global Edge CDN
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt CloudFrontOAC.Id
+            S3OriginConfig: {}
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+          MinTTL: 0
+          DefaultTTL: 86400
+          MaxTTL: 31536000
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 10
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 10
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+          MinimumProtocolVersion: TLSv1.2_2021
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  # ----------------------------------------------------------------------
+  # 3. Amazon DynamoDB Serverless Table
+  # ----------------------------------------------------------------------
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AppName}-data"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  # ----------------------------------------------------------------------
+  # 4. AWS Lambda Execution IAM Role
+  # ----------------------------------------------------------------------
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AppName}-lambda-role-${AWS::Region}"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt DynamoTable.Arn
+
+  # ----------------------------------------------------------------------
+  # 5. AWS Lambda Backend Function (Graviton3 ARM64)
+  # ----------------------------------------------------------------------
+  BackendLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AppName}-api"
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 10
+      MemorySize: 512
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DynamoTable
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            const path = event.rawPath || event.path || '/api/health';
+            const headers = {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+              'X-Powered-By': 'CloudPulse AI (AWS Graviton3)'
+            };
+            if (event.requestContext?.http?.method === 'OPTIONS') {
+              return { statusCode: 200, headers, body: JSON.stringify({ message: 'OK' }) };
+            }
+            if (path === '/api/health') {
+              return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({
+                  status: 'healthy',
+                  timestamp: new Date().toISOString(),
+                  cloud: 'AWS',
+                  runtime: 'Node.js 20.x Graviton3 (ARM64)',
+                  freeTier: true
+                })
+              };
+            }
+            return {
+              statusCode: 200,
+              headers,
+              body: JSON.stringify({
+                message: 'CloudPulse AI Backend Online',
+                path,
+                time: new Date().toISOString()
+              })
+            };
+          };
+
+  # ----------------------------------------------------------------------
+  # 6. Amazon API Gateway v2 HTTP API
+  # ----------------------------------------------------------------------
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${AppName}-http-api"
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins: ['*']
+        AllowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+        AllowHeaders: ['Content-Type', 'Authorization']
+        MaxAge: 300
+
+  HttpApiIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt BackendLambdaFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  HttpApiDefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: $default
+      Target: !Sub "integrations/${HttpApiIntegration}"
+
+  HttpApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: $default
+      AutoDeploy: true
+
+  LambdaPermissionApiGateway:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref BackendLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*"
+
+Outputs:
+  CloudFrontURL:
+    Description: CloudFront CDN Live URL
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+  FrontendBucketName:
+    Description: S3 Static Website Bucket Name
+    Value: !Ref FrontendBucket
+  CloudFrontDistributionId:
+    Description: CloudFront Distribution ID
+    Value: !Ref CloudFrontDistribution
+  ApiGatewayEndpoint:
+    Description: API Gateway HTTP Endpoint
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  DynamoTableName:
+    Description: DynamoDB Table Name
+    Value: !Ref DynamoTable
