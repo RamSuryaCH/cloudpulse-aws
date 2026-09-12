@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Cloud, ShieldCheck, DollarSign, Activity, Globe, Award, Sparkles, Server, Search, Volume2, VolumeX } from 'lucide-react';
+import { Cloud, ShieldCheck, DollarSign, Activity, Globe, Sparkles, Server, Search, Volume2, VolumeX, BookOpen } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sounds } from '../utils/soundEffects';
 
@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'security', label: 'Well-Architected Audit', icon: ShieldCheck },
     { id: 'telemetry', label: 'Live Telemetry', icon: Activity },
     { id: 'inspector', label: 'AWS Deployment', icon: Globe },
-    { id: 'submission', label: 'Challenge Pack', icon: Award },
+    { id: 'manifest', label: 'Stack Manifest', icon: BookOpen },
   ];
 
   const regions = [
@@ -138,16 +138,16 @@ export const Header: React.FC<HeaderProps> = ({
               {isMuted ? <VolumeX className="w-4 h-4 text-slate-500" /> : <Volume2 className="w-4 h-4 text-[#F59E0B]" />}
             </button>
 
-            {/* Challenge Entry Button */}
+            {/* Stack Manifest Button */}
             <button
               onClick={() => {
                 sounds.playSuccess();
-                setActiveTab('submission');
+                setActiveTab('manifest');
               }}
-              className="flex items-center space-x-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#FBBF24] hover:to-[#F59E0B] text-black font-extrabold text-xs shadow-lg shadow-[#F59E0B]/20 transition-all active:scale-95 duration-150"
+              className="flex items-center space-x-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#FBBF24] hover:to-[#F59E0B] text-black font-extrabold text-xs shadow-lg shadow-[#F59E0B]/20 transition-all active:scale-95 duration-150 cursor-pointer"
             >
-              <Award className="w-4 h-4 text-black stroke-[2.5]" />
-              <span>Challenge Entry</span>
+              <BookOpen className="w-4 h-4 text-black stroke-[2.5]" />
+              <span>Stack Manifest</span>
             </button>
 
             {/* Celebrate Button */}

@@ -26,7 +26,7 @@ provider "aws" {
       Project     = "CloudPulse-AI"
       Environment = var.environment
       ManagedBy   = "Terraform"
-      Challenge   = "AWS-Weekend-Challenge"
+      Architecture = "Serverless-Multi-Tier"
     }
   }
 }

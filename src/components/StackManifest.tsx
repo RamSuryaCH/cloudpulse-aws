@@ -1,48 +1,63 @@
 import React, { useState } from 'react';
-import { Award, Copy, Check, Terminal, FileCode, CheckCircle2, ExternalLink } from 'lucide-react';
+import { Copy, Check, Terminal, FileCode, CheckCircle2, ExternalLink, BookOpen } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sounds } from '../utils/soundEffects';
 
-export const SubmissionPack: React.FC = () => {
+export const StackManifest: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [copiedCmd, setCopiedCmd] = useState(false);
 
-  const submissionText = `🚀 Weekend Challenge Submission: CloudPulse AI (AWS Architecture Studio & Serverless Observability Hub)
+  const manifestText = `🚀 AWS Production Infrastructure Manifest
+CloudFront CDN Live URL: https://d1pugni5iia6hw.cloudfront.net
+API Gateway Endpoint: https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com
+GitHub Repository: https://github.com/RamSuryaCH/cloudpulse-aws
 
-Project Name: CloudPulse AI
-Live URL: https://d1pugni5iia6hw.cloudfront.net
-GitHub Repo: https://github.com/RamSuryaCH/cloudpulse-aws
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🛠️ Provisioned AWS Infrastructure Services:
+1. Amazon CloudFront (Global CDN Edge):
+   • 600+ Global Edge Points of Presence
+   • Origin Access Control (OAC) Enforced for Zero-Bypass S3 Security
+   • TLS 1.3 / Strict HTTPS & Brotli/Gzip Compression
+   • Distribution ID: EJW28095DC509
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🛠️ AWS Services Used:
-• Amazon CloudFront: Global Edge CDN (600+ POPs) with Origin Access Control (OAC), TLS 1.3, Brotli/Gzip compression.
-• Amazon S3: Static Single Page Application hosting with SSE-AES256 server-side encryption and Block Public Access (cloudpulse-app-frontendbucket-arswr5lhouip).
-• Amazon API Gateway v2: HTTP API gateway with low-latency AWS Proxy routing and built-in CORS configuration (https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com).
-• AWS Lambda: Event-driven serverless compute running on 64-bit ARM AWS Graviton3 (34% better price/performance).
-• Amazon DynamoDB: Serverless On-Demand NoSQL table with single-digit millisecond latency and Point-in-Time Recovery (PITR) (cloudpulse-challenge-data).
-• Amazon Route 53 & ACM: DNS routing with free automated SSL/TLS certificate management.
-• Amazon CloudWatch & X-Ray: Unified observability, log groups, and metric alarms for error rate monitoring.
+2. Amazon Simple Storage Service (S3):
+   • Bucket: cloudpulse-app-frontendbucket-arswr5lhouip
+   • Server-Side Encryption: AES-256 (SSE-S3)
+   • Block Public Access: 100% Enforced with OAC CachingOptimized Policy
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💡 What I Built & How AWS Was Used:
-CloudPulse AI is an interactive AWS Serverless Architecture Studio and Cloud Cost/Security Auditor built to empower cloud engineers to visualize, audit, and generate Infrastructure-as-Code in real-time.
+3. Amazon API Gateway v2 (HTTP API):
+   • Low-latency proxy integration with Graviton3 Lambda
+   • Built-in CORS routing & Auto-deploy stages
 
-Key Highlights:
-1. 🎨 Visual Cloud Canvas: Drag-and-drop or select AWS building blocks to design architectures with real-time Terraform and AWS CDK code generation.
-2. 💰 Cost & Free-Tier Guard: Real-time cost estimator calculating monthly spend, Graviton3 savings, and alerting on free-tier consumption.
-3. 🛡️ Well-Architected 6-Pillar Audit: Instant compliance checklist scoring security, reliability, performance, cost, ops, and sustainability (98% Score).
-4. ⚡ Live Serverless Telemetry Hub: Real-time API invoker with sub-25ms latency meter and live CloudWatch structured log stream.
-5. 🚀 Infrastructure as Code (IaC): 100% automated with both Terraform modules, AWS CDK (TypeScript) stacks, and CloudFormation template + GitHub Actions CI/CD pipeline!
+4. AWS Lambda (Serverless Compute):
+   • Runtime: Node.js 20.x on 64-bit ARM AWS Graviton3
+   • 34% superior price/performance vs legacy x86_64 architectures
+   • Sub-25ms execution latency with 512 MB memory tier
 
-Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
+5. Amazon DynamoDB (Serverless NoSQL):
+   • Table: cloudpulse-production-data
+   • Billing Mode: PAY_PER_REQUEST (On-Demand Zero Idle Cost)
+   • Continuous Point-In-Time Recovery (PITR) Enabled
 
-  const handleCopySubmission = () => {
+6. Amazon CloudWatch & AWS X-Ray:
+   • Centralized Log Group: /aws/lambda/cloudpulse-core-api
+   • Metric Alarms & Distributed Trace Telemetry
+   • 30-Day Auto-Expiring Log Retention
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 Architectural Highlights:
+• 100% Serverless & Zero-Server Maintenance
+• 98% AWS Well-Architected Framework Compliance Score
+• $0.00 / month Baseline Spend (100% Covered by AWS Free Tier)
+• Multi-IaC Generator for Terraform, AWS CDK (TypeScript), and Pulumi`;
+
+  const handleCopyManifest = () => {
     sounds.playSuccess();
-    navigator.clipboard.writeText(submissionText);
+    navigator.clipboard.writeText(manifestText);
     setCopied(true);
     confetti({
-      particleCount: 150,
-      spread: 90,
+      particleCount: 120,
+      spread: 80,
       origin: { y: 0.5 },
       colors: ['#F59E0B', '#30D158', '#0A84FF', '#FFFFFF', '#D97706']
     });
@@ -64,12 +79,12 @@ Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
           <div className="space-y-3">
             <div className="flex items-center space-x-3.5">
               <div className="w-12 h-12 rounded-2xl bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/40 flex items-center justify-center">
-                <Award className="w-7 h-7 stroke-[2.2]" />
+                <BookOpen className="w-7 h-7 stroke-[2.2]" />
               </div>
-              <h2 className="text-3xl font-black text-white tracking-tight">Official Challenge Submission Pack</h2>
+              <h2 className="text-3xl font-black text-white tracking-tight">Production Architecture Manifest</h2>
             </div>
             <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Formatted according to the AWS Weekend Challenge submission requirements with verified live endpoints. Copy the post content directly to submit!
+              Complete architectural specification, service inventory, and CloudFormation infrastructure definitions for the live application.
             </p>
           </div>
 
@@ -86,11 +101,11 @@ Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
             </a>
 
             <button
-              onClick={handleCopySubmission}
+              onClick={handleCopyManifest}
               className="flex items-center space-x-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#FBBF24] hover:to-[#F59E0B] text-black font-black text-xs shadow-xl shadow-[#F59E0B]/25 transition-all active:scale-95 duration-150 cursor-pointer"
             >
               {copied ? <Check className="w-4 h-4 text-black stroke-[2.5]" /> : <Copy className="w-4 h-4 text-black stroke-[2.5]" />}
-              <span>{copied ? 'Copied to Clipboard! 🎉' : 'Copy Submission Post'}</span>
+              <span>{copied ? 'Copied to Clipboard! 🎉' : 'Copy Full Manifest'}</span>
             </button>
           </div>
         </div>
@@ -103,15 +118,15 @@ Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
           <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-5">
             <h3 className="text-base font-bold uppercase tracking-wider text-white flex items-center gap-2.5 font-mono">
               <FileCode className="w-5 h-5 text-[#F59E0B]" />
-              Submission Post Markdown Preview
+              Architecture Specification & Inventory
             </h3>
             <span className="text-xs text-[#30D158] font-mono bg-[#30D158]/10 px-3.5 py-1 rounded-full border border-[#30D158]/30 font-bold">
-              100% Ready
+              Production Verified
             </span>
           </div>
 
           <div className="flex-1 bg-[#050508] border border-white/[0.08] rounded-3xl p-6 font-mono text-xs text-slate-200 leading-relaxed overflow-y-auto max-h-[520px]">
-            <pre className="whitespace-pre-wrap font-mono text-slate-200">{submissionText}</pre>
+            <pre className="whitespace-pre-wrap font-mono text-slate-200">{manifestText}</pre>
           </div>
         </div>
 

@@ -6,7 +6,7 @@
 [![Graviton3](https://img.shields.io/badge/Compute-Graviton3_ARM64-FF9900?style=for-the-badge&logo=arm&logoColor=white)](https://aws.amazon.com/ec2/graviton/)
 [![Cost](https://img.shields.io/badge/Monthly_Cost-$0.00_(Free_Tier)-10B981?style=for-the-badge)](https://aws.amazon.com/free/)
 
-> Built for the **AWS Weekend Challenge: "Deploy your first app on AWS"**. A full-stack, production-grade cloud visualizer, cost optimizer, security compliance auditor, and real-time observability platform.
+> Enterprise-grade AWS Serverless visual architecture studio, multi-cloud cost guard, Well-Architected 6-pillar compliance auditor, and real-time observability telemetry platform.
 
 ---
 

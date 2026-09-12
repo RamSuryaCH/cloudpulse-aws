@@ -19,7 +19,7 @@ export const TelemetryHub: React.FC = () => {
       timestamp: new Date(Date.now() - 4800).toISOString(),
       level: 'INFO',
       service: 'aws:dynamodb:query',
-      message: 'DynamoDB GetItem completed in 3.2ms. Table: cloudpulse-challenge-data. Status: 200 OK.',
+      message: 'DynamoDB GetItem completed in 3.2ms. Table: cloudpulse-production-data. Status: 200 OK.',
       latencyMs: 3.2,
       requestId: '8f92-41ab-8c9e-128f9241ab8c'
     },
@@ -269,7 +269,7 @@ export const TelemetryHub: React.FC = () => {
                 className="flex-1 bg-white/[0.04] border border-white/[0.08] text-white font-mono text-xs px-4 py-3 rounded-2xl focus:outline-none cursor-pointer"
               >
                 <option value="/api/health">/api/health (Graviton3 Lambda Handler)</option>
-                <option value="/api/challenge/status">/api/challenge/status (DynamoDB Read)</option>
+                <option value="/api/status">/api/status (DynamoDB Read)</option>
                 <option value="/api/metrics">/api/metrics (CloudWatch Metric Query)</option>
               </select>
 

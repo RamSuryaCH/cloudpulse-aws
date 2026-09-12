@@ -6,7 +6,6 @@ import {
   ShieldCheck, 
   Activity, 
   Globe, 
-  Award, 
   ArrowRight, 
   Sparkles, 
   Layers, 
@@ -52,7 +51,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     { id: 'tab-security', label: 'Well-Architected Audit', category: 'Navigation', icon: ShieldCheck, action: () => { onSelectTab('security'); onClose(); } },
     { id: 'tab-telemetry', label: 'Live Telemetry & Logs', category: 'Navigation', icon: Activity, action: () => { onSelectTab('telemetry'); onClose(); } },
     { id: 'tab-inspector', label: 'AWS Deployment View', category: 'Navigation', icon: Globe, action: () => { onSelectTab('inspector'); onClose(); } },
-    { id: 'tab-submission', label: 'Challenge Submission Pack', category: 'Navigation', icon: Award, action: () => { onSelectTab('submission'); onClose(); } },
+    { id: 'tab-manifest', label: 'Production Stack Manifest', category: 'Navigation', icon: Globe, action: () => { onSelectTab('manifest'); onClose(); } },
 
     // Blueprints
     ...ARCHITECTURE_TEMPLATES.map(t => ({

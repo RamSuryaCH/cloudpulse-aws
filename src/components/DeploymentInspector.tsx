@@ -70,7 +70,7 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
       icon: Database,
       status: 'Zero Idle Cost',
       details: [
-        { label: 'Table Name', value: 'cloudpulse-challenge-data' },
+        { label: 'Table Name', value: 'cloudpulse-production-data' },
         { label: 'Capacity Mode', value: 'PAY_PER_REQUEST (On-Demand)' },
         { label: 'Point-In-Time Recovery', value: 'Enabled (35-day Continuous Backup)' },
         { label: 'Monthly Base Cost', value: '$0.00 (Within 25 GB Free Tier)' }
@@ -83,7 +83,7 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
       icon: Zap,
       status: 'Live Alarms',
       details: [
-        { label: 'Log Group', value: '/aws/lambda/cloudpulse-challenge-api' },
+        { label: 'Log Group', value: '/aws/lambda/cloudpulse-core-api' },
         { label: 'Metric Alarms', value: 'High Error Rate (>5 errors/min)' },
         { label: 'Distributed Tracing', value: 'AWS X-Ray Active Tracing' },
         { label: 'Log Retention', value: '30 Days Auto-expire' }

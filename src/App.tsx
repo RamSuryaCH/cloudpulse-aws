@@ -5,7 +5,7 @@ import { CostOptimizer } from './components/CostOptimizer';
 import { SecurityAuditor } from './components/SecurityAuditor';
 import { TelemetryHub } from './components/TelemetryHub';
 import { DeploymentInspector } from './components/DeploymentInspector';
-import { SubmissionPack } from './components/SubmissionPack';
+import { StackManifest } from './components/StackManifest';
 import { CommandPalette } from './components/CommandPalette';
 import { Cloud } from 'lucide-react';
 
@@ -49,8 +49,8 @@ export function App() {
         {activeTab === 'inspector' && (
           <DeploymentInspector selectedRegion={selectedRegion} />
         )}
-        {activeTab === 'submission' && (
-          <SubmissionPack />
+        {activeTab === 'manifest' && (
+          <StackManifest />
         )}
       </main>
 
@@ -63,7 +63,7 @@ export function App() {
             </div>
             <span className="font-extrabold text-white text-sm">CloudPulse AI</span>
             <span className="text-slate-600">—</span>
-            <span className="text-slate-400">AWS Weekend Challenge Production Stack</span>
+            <span className="text-slate-400">Enterprise AWS Serverless Architecture Studio</span>
           </div>
 
           <div className="flex items-center space-x-5 font-mono text-xs">
