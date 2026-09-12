@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   Cloud, 
-  Plus, 
   Trash2, 
   Copy, 
   Check, 
@@ -58,7 +57,7 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
     const newNode: ArchitectureNode = {
       id: newNodeId,
       serviceId: service.id,
-      label: `${service.code} Node`,
+      label: `${service.code} Instance`,
       x: 350 + (nodes.length * 30) % 250,
       y: 120 + (nodes.length * 40) % 180,
       config: { ...service.defaultConfig }
@@ -139,290 +138,281 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
   const selectedService = selectedNode ? AWS_SERVICES.find(s => s.id === selectedNode.serviceId) : null;
 
   return (
-    <div className="space-y-8">
-      {/* Studio Header & Intro */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/[0.06]">
-        <div>
-          <div className="flex items-center space-x-2 text-[#FF9900] text-xs font-mono font-semibold uppercase tracking-wider mb-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Interactive Cloud Topology & IaC Synthesis</span>
-          </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">AWS Architecture Studio</h1>
-          <p className="text-sm text-slate-300 mt-1 max-w-2xl">
-            Design multi-tier AWS serverless blueprints visually. Generate production Terraform, AWS CDK, and Pulumi stacks in real-time.
-          </p>
+    <div className="space-y-12">
+      {/* Hero Header */}
+      <div className="space-y-3 max-w-3xl">
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-[#F59E0B] text-xs font-mono font-semibold">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Interactive Serverless Studio & Code Synthesis</span>
         </div>
-        <div className="flex items-center space-x-3 text-xs font-mono">
-          <span className="px-3 py-1.5 rounded-xl bg-[#0F1B2A] border border-white/[0.08] text-slate-300">
-            Region: <span className="text-[#FF9900] font-bold">{selectedRegion}</span>
-          </span>
-          <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold">
-            Live AWS Verified
-          </span>
-        </div>
+        <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+          AWS Architecture Studio
+        </h1>
+        <p className="text-base text-slate-400 leading-relaxed">
+          Design resilient multi-tier AWS serverless architectures with real-time Terraform, AWS CDK, and Pulumi synthesis.
+        </p>
       </div>
 
-      {/* Spacious Topology Preset Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {ARCHITECTURE_TEMPLATES.map((tmpl) => {
-          const isSelected = currentTemplate.id === tmpl.id;
-          return (
-            <div
-              key={tmpl.id}
-              onClick={() => handleSelectTemplate(tmpl)}
-              className={`aws-card p-6 cursor-pointer select-none relative overflow-hidden transition-all duration-200 ${
-                isSelected ? 'aws-card-active' : ''
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-bold text-base text-white flex items-center gap-2">
-                  {tmpl.name}
-                </span>
-                <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-lg bg-[#FF9900]/15 text-[#FF9900] border border-[#FF9900]/30">
-                  {tmpl.badge}
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 leading-relaxed mb-4 line-clamp-2">
-                {tmpl.description}
-              </p>
-              <div className="flex items-center justify-between text-xs font-mono text-slate-300 pt-3 border-t border-white/[0.08]">
-                <span className="text-emerald-400 font-bold text-sm">
-                  ${tmpl.estimatedCost.toFixed(2)} <span className="text-[10px] text-slate-400 font-normal">/ mo</span>
-                </span>
-                <span className="text-slate-300 bg-[#0B111B] px-2.5 py-1 rounded-lg border border-white/[0.06]">
-                  Well-Architected: <strong className="text-emerald-400">{tmpl.complianceScore}%</strong>
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Main Studio Area: Catalog, Topology Canvas, and IaC Generator */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        {/* Left: AWS Service Catalog */}
-        <div className="xl:col-span-3 aws-card p-5 flex flex-col">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#FF9900]" />
-              AWS Catalog
-            </h3>
-            <span className="text-xs text-slate-400 font-mono">1-Click Add</span>
-          </div>
-
-          {/* Category Filter Pills */}
-          <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1 no-scrollbar text-xs">
-            {['all', 'compute', 'storage', 'database', 'networking'].map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  sounds.playClick();
-                  setActiveCategory(cat);
-                }}
-                className={`px-3 py-1.5 rounded-lg capitalize font-medium transition-all ${
-                  activeCategory === cat
-                    ? 'bg-[#FF9900]/20 text-[#FF9900] border border-[#FF9900]/40 font-semibold'
-                    : 'text-slate-400 hover:text-slate-200 bg-[#0B111B] border border-white/[0.05]'
+      {/* Spacious 3-Card Architecture Presets */}
+      <div className="space-y-4">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
+          Featured Architecture Presets
+        </h3>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {ARCHITECTURE_TEMPLATES.map((tmpl) => {
+            const isSelected = currentTemplate.id === tmpl.id;
+            return (
+              <div
+                key={tmpl.id}
+                onClick={() => handleSelectTemplate(tmpl)}
+                className={`apple-card p-8 cursor-pointer select-none transition-all duration-300 flex flex-col justify-between min-h-[220px] ${
+                  isSelected ? 'apple-card-selected' : ''
                 }`}
               >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          <div className="space-y-2 overflow-y-auto max-h-[580px] pr-1">
-            {AWS_SERVICES
-              .filter(s => activeCategory === 'all' || s.category === activeCategory)
-              .map((service) => {
-                const Icon = getServiceIcon(service.id);
-                return (
-                  <div
-                    key={service.id}
-                    onClick={() => handleAddService(service.id)}
-                    className="group p-3 rounded-xl bg-[#0B111B] border border-white/[0.06] hover:border-[#FF9900]/50 hover:bg-[#141F30] cursor-pointer transition-all duration-150 flex items-center justify-between shadow-sm"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-xl bg-[#141F30] border border-white/[0.08] flex items-center justify-center text-[#FF9900] group-hover:scale-110 transition-transform">
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-slate-200 group-hover:text-[#FF9900]">
-                          {service.code}
-                        </div>
-                        <div className="text-[11px] text-slate-400 line-clamp-1 font-mono">
-                          {service.freeTier}
-                        </div>
-                      </div>
-                    </div>
-                    <button 
-                      aria-label={`Add ${service.code} node`}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-[#FF9900]/20 text-[#FF9900] transition-opacity"
-                    >
-                      <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                    </button>
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-extrabold text-lg text-white">
+                      {tmpl.name}
+                    </span>
+                    <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-[#F59E0B]/15 text-[#F59E0B] border border-[#F59E0B]/30">
+                      {tmpl.badge}
+                    </span>
                   </div>
-                );
-              })}
-          </div>
+                  <p className="text-xs text-slate-300 leading-relaxed mb-6">
+                    {tmpl.description}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-mono pt-4 border-t border-white/[0.08]">
+                  <span className="text-[#30D158] font-bold text-sm">
+                    ${tmpl.estimatedCost.toFixed(2)} <span className="text-[11px] text-slate-400 font-normal">/ mo</span>
+                  </span>
+                  <span className="text-slate-300 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
+                    Well-Architected: <strong className="text-[#30D158]">{tmpl.complianceScore}%</strong>
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
+      </div>
 
-        {/* Center: Topology Canvas Map */}
-        <div className="xl:col-span-5 aws-card p-5 flex flex-col min-h-[640px]">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
-            <div className="flex items-center space-x-2.5">
-              <h3 className="text-sm font-bold text-slate-100 tracking-wide uppercase">
-                Active Topology Canvas
-              </h3>
-              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-lg bg-[#0B111B] text-[#FF9900] border border-white/[0.08]">
-                {nodes.length} Nodes
-              </span>
-            </div>
+      {/* Main Expansive Canvas & Service Palette */}
+      <div className="apple-card p-8 space-y-6">
+        {/* Top Control Bar: Catalog Categories & Traffic Toggle */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
+          <div className="flex items-center space-x-3">
+            <Layers className="w-5 h-5 text-[#F59E0B]" />
+            <h3 className="text-base font-bold text-white">Visual Cloud Topology</h3>
+            <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-white/[0.06] text-slate-300 border border-white/[0.08]">
+              {nodes.length} Provisioned Nodes
+            </span>
+          </div>
 
+          <div className="flex items-center space-x-3">
             <button
               onClick={() => {
                 sounds.playSwitch();
                 setIsSimulatingTraffic(!isSimulatingTraffic);
               }}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                 isSimulatingTraffic
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                  : 'bg-[#0B111B] text-slate-400 border border-white/[0.08]'
+                  ? 'bg-[#30D158]/15 text-[#30D158] border border-[#30D158]/30'
+                  : 'bg-white/[0.04] text-slate-400 border border-white/[0.08]'
               }`}
             >
-              <span className={`w-2 h-2 rounded-full ${isSimulatingTraffic ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
-              <span>{isSimulatingTraffic ? 'Live Edge Traffic' : 'Simulation Paused'}</span>
+              <span className={`w-2 h-2 rounded-full ${isSimulatingTraffic ? 'bg-[#30D158] animate-pulse' : 'bg-slate-500'}`} />
+              <span>{isSimulatingTraffic ? 'Live Traffic Active' : 'Traffic Paused'}</span>
             </button>
-          </div>
-
-          {/* Canvas Area with Dot Grid */}
-          <div className="relative flex-1 bg-[#090D15] rounded-2xl border border-white/[0.08] aws-canvas-grid p-5 overflow-hidden flex flex-col justify-between">
-            {/* SVG Traffic & Connection Lines */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-              <defs>
-                <linearGradient id="connGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FF9900" stopOpacity="0.8" />
-                  <stop offset="50%" stopColor="#539FE5" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#10B981" stopOpacity="0.8" />
-                </linearGradient>
-              </defs>
-              {connections.map((conn) => {
-                const sourceIdx = nodes.findIndex(n => n.id === conn.from);
-                const targetIdx = nodes.findIndex(n => n.id === conn.to);
-                if (sourceIdx === -1 || targetIdx === -1) return null;
-
-                return (
-                  <g key={conn.id}>
-                    <line
-                      x1={`${Math.min(90, Math.max(10, 15 + sourceIdx * 22))}%`}
-                      y1={`${22 + (sourceIdx % 3) * 28}%`}
-                      x2={`${Math.min(90, Math.max(10, 15 + targetIdx * 22))}%`}
-                      y2={`${22 + (targetIdx % 3) * 28}%`}
-                      stroke="url(#connGrad)"
-                      strokeWidth="2.5"
-                      strokeDasharray={isSimulatingTraffic ? "6 4" : "none"}
-                    />
-                  </g>
-                );
-              })}
-            </svg>
-
-            {/* Interactive Node Cards */}
-            <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-3.5 my-auto">
-              {nodes.map((node) => {
-                const service = AWS_SERVICES.find(s => s.id === node.serviceId);
-                const Icon = getServiceIcon(node.serviceId);
-                const isSelected = selectedNodeId === node.id;
-
-                return (
-                  <div
-                    key={node.id}
-                    onClick={() => {
-                      sounds.playClick();
-                      setSelectedNodeId(node.id);
-                    }}
-                    className={`relative p-3.5 rounded-xl border transition-all duration-200 cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#141F30] border-[#FF9900] shadow-xl shadow-[#FF9900]/15 ring-2 ring-[#FF9900]/30'
-                        : 'bg-[#0F1B2A]/90 border-white/[0.08] hover:border-slate-600 hover:bg-[#121D2C]'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="w-8 h-8 rounded-lg bg-[#FF9900]/15 border border-[#FF9900]/25 flex items-center justify-center text-[#FF9900]">
-                        <Icon className="w-4 h-4 stroke-[2.2]" />
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteNode(node.id);
-                        }}
-                        className="text-slate-500 hover:text-rose-400 p-1 rounded-md transition-colors"
-                        title="Delete node"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    <div className="mt-2.5">
-                      <h4 className="text-xs font-bold text-white line-clamp-1">{node.label}</h4>
-                      <span className="text-[11px] text-[#539FE5] font-mono font-medium">{service?.code}</span>
-                    </div>
-
-                    {isSelected && (
-                      <div className="absolute -top-2 -right-1 bg-[#FF9900] text-slate-950 font-extrabold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
-                        Selected
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Selected Node Inspector Drawer */}
-            {selectedNode && selectedService && (
-              <div className="relative z-10 bg-[#0B111B] border border-[#FF9900]/30 rounded-xl p-4 mt-4 shadow-xl">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-xs text-[#FF9900] flex items-center gap-2">
-                    <Settings className="w-4 h-4 text-[#FF9900]" />
-                    {selectedService.name} Specification
-                  </span>
-                  <button 
-                    onClick={() => {
-                      sounds.playClick();
-                      setSelectedNodeId(null);
-                    }} 
-                    aria-label="Close specification drawer"
-                    className="text-slate-400 hover:text-white p-1 rounded-md"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                <p className="text-slate-300 text-xs leading-relaxed mb-3">{selectedService.description}</p>
-                <div className="grid grid-cols-2 gap-3 text-xs font-mono bg-[#07090E] p-3 rounded-lg border border-white/[0.06]">
-                  <div>
-                    <span className="text-slate-400 text-[11px]">Free Tier Allowance:</span>
-                    <p className="text-emerald-400 font-semibold mt-0.5">{selectedService.freeTier}</p>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 text-[11px]">Target Region:</span>
-                    <p className="text-slate-200 font-semibold mt-0.5">{selectedRegion}</p>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Right: Code Generation & IaC Pane */}
-        <div className="xl:col-span-4 aws-card p-5 flex flex-col h-full">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
-            <div className="flex items-center space-x-2">
-              <Code2 className="w-4 h-4 text-[#FF9900]" />
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-100">
-                IaC Generator
-              </h3>
+        {/* AWS Catalog 1-Click Add Bar */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono text-slate-400 font-semibold uppercase tracking-wider">
+              Insert AWS Building Block:
+            </span>
+            <div className="flex space-x-1.5">
+              {['all', 'compute', 'storage', 'database', 'networking'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    sounds.playClick();
+                    setActiveCategory(cat);
+                  }}
+                  className={`px-3 py-1 rounded-full capitalize text-xs font-semibold transition-all ${
+                    activeCategory === cat
+                      ? 'bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/40'
+                      : 'text-slate-400 hover:text-white bg-white/[0.03]'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            {AWS_SERVICES
+              .filter(s => activeCategory === 'all' || s.category === activeCategory)
+              .map((service) => {
+                const Icon = getServiceIcon(service.id);
+                return (
+                  <button
+                    key={service.id}
+                    onClick={() => handleAddService(service.id)}
+                    className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-[#F59E0B]/50 transition-all flex flex-col items-center justify-center text-center group cursor-pointer"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-white/[0.06] flex items-center justify-center text-[#F59E0B] group-hover:scale-110 transition-transform mb-2">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-200 group-hover:text-[#F59E0B] line-clamp-1">
+                      {service.code}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                      + Add
+                    </span>
+                  </button>
+                );
+              })}
+          </div>
+        </div>
+
+        {/* Expansive Canvas Area */}
+        <div className="relative min-h-[460px] bg-[#050508] rounded-3xl border border-white/[0.08] apple-canvas-bg p-8 overflow-hidden flex flex-col justify-between">
+          {/* SVG Traffic & Connection Lines */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+            <defs>
+              <linearGradient id="appleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.9" />
+                <stop offset="50%" stopColor="#0A84FF" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#30D158" stopOpacity="0.9" />
+              </linearGradient>
+            </defs>
+            {connections.map((conn) => {
+              const sourceIdx = nodes.findIndex(n => n.id === conn.from);
+              const targetIdx = nodes.findIndex(n => n.id === conn.to);
+              if (sourceIdx === -1 || targetIdx === -1) return null;
+
+              return (
+                <g key={conn.id}>
+                  <line
+                    x1={`${Math.min(90, Math.max(10, 15 + sourceIdx * 20))}%`}
+                    y1={`${24 + (sourceIdx % 3) * 26}%`}
+                    x2={`${Math.min(90, Math.max(10, 15 + targetIdx * 20))}%`}
+                    y2={`${24 + (targetIdx % 3) * 26}%`}
+                    stroke="url(#appleGrad)"
+                    strokeWidth="3"
+                    strokeDasharray={isSimulatingTraffic ? "8 5" : "none"}
+                  />
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Nodes Grid */}
+          <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 my-auto">
+            {nodes.map((node) => {
+              const service = AWS_SERVICES.find(s => s.id === node.serviceId);
+              const Icon = getServiceIcon(node.serviceId);
+              const isSelected = selectedNodeId === node.id;
+
+              return (
+                <div
+                  key={node.id}
+                  onClick={() => {
+                    sounds.playClick();
+                    setSelectedNodeId(node.id);
+                  }}
+                  className={`relative p-5 rounded-2xl border transition-all duration-300 cursor-pointer ${
+                    isSelected
+                      ? 'bg-white/[0.12] border-[#F59E0B] shadow-2xl shadow-[#F59E0B]/20 ring-2 ring-[#F59E0B]/40 scale-[1.02]'
+                      : 'bg-[#0E0E14]/90 border-white/[0.08] hover:border-white/[0.2] hover:bg-[#14141E]'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-[#F59E0B]/15 border border-[#F59E0B]/30 flex items-center justify-center text-[#F59E0B]">
+                      <Icon className="w-5 h-5 stroke-[2.2]" />
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteNode(node.id);
+                      }}
+                      className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg transition-colors"
+                      title="Delete node"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="mt-3">
+                    <h4 className="text-sm font-bold text-white line-clamp-1">{node.label}</h4>
+                    <span className="text-xs text-[#0A84FF] font-mono font-semibold">{service?.code}</span>
+                  </div>
+
+                  {isSelected && (
+                    <div className="absolute -top-2.5 -right-1 bg-[#F59E0B] text-black font-black text-[9px] px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-md">
+                      Selected
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Selected Node Configuration Drawer */}
+          {selectedNode && selectedService && (
+            <div className="relative z-10 bg-[#0C0C12] border border-[#F59E0B]/40 rounded-2xl p-5 mt-6 shadow-2xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-extrabold text-sm text-[#F59E0B] flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-[#F59E0B]" />
+                  {selectedService.name} Specification
+                </span>
+                <button 
+                  onClick={() => {
+                    sounds.playClick();
+                    setSelectedNodeId(null);
+                  }} 
+                  aria-label="Close drawer"
+                  className="text-slate-400 hover:text-white p-1"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-slate-300 text-xs leading-relaxed mb-4">{selectedService.description}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono bg-black/50 p-4 rounded-xl border border-white/[0.06]">
+                <div>
+                  <span className="text-slate-400 text-[11px]">Free Tier Quota:</span>
+                  <p className="text-[#30D158] font-bold mt-1">{selectedService.freeTier}</p>
+                </div>
+                <div>
+                  <span className="text-slate-400 text-[11px]">Target Region:</span>
+                  <p className="text-slate-200 font-bold mt-1">{selectedRegion}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Infrastructure as Code Synthesis Suite */}
+      <div className="apple-card p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#F59E0B]/15 border border-[#F59E0B]/30 flex items-center justify-center text-[#F59E0B]">
+              <Code2 className="w-5 h-5 stroke-[2.2]" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">Infrastructure as Code Synthesis</h3>
+              <p className="text-xs text-slate-400 font-mono">Live code generated directly from canvas topology</p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
             {/* IaC Switcher Tabs */}
-            <div className="apple-segmented-pill flex items-center space-x-1 p-1">
+            <div className="apple-nav-bar flex items-center space-x-1 p-1">
               {(['terraform', 'cdk', 'pulumi'] as const).map((mode) => (
                 <button
                   key={mode}
@@ -430,54 +420,48 @@ export const ArchitectureStudio: React.FC<ArchitectureStudioProps> = ({ selected
                     sounds.playSwitch();
                     setCodeMode(mode);
                   }}
-                  className={`px-3 py-1 rounded-lg text-xs capitalize font-semibold transition-all ${
+                  className={`px-4 py-1.5 rounded-full text-xs capitalize font-bold transition-all ${
                     codeMode === mode
-                      ? 'bg-[#FF9900] text-slate-950 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-[#F59E0B] text-black shadow-md'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   {mode}
                 </button>
               ))}
             </div>
-          </div>
 
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-slate-400 font-mono">
-              {codeMode === 'terraform' ? 'main.tf' : codeMode === 'cdk' ? 'CloudPulseStack.ts' : 'index.ts'}
-            </span>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handleCopyCode}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#141F30] hover:bg-[#1E2D44] text-slate-200 text-xs font-semibold transition-colors border border-white/[0.08]"
-              >
-                {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedCode ? 'Copied!' : 'Copy'}</span>
-              </button>
-              <button
-                onClick={handleDownloadCode}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#FF9900]/20 hover:bg-[#FF9900]/30 text-[#FF9900] text-xs font-semibold transition-colors border border-[#FF9900]/40"
-              >
-                <Download className="w-3.5 h-3.5 stroke-[2.2]" />
-                <span>Export</span>
-              </button>
-            </div>
-          </div>
+            <button
+              onClick={handleCopyCode}
+              className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-slate-200 text-xs font-bold transition-colors border border-white/[0.08]"
+            >
+              {copiedCode ? <Check className="w-4 h-4 text-[#30D158]" /> : <Copy className="w-4 h-4" />}
+              <span>{copiedCode ? 'Copied!' : 'Copy Code'}</span>
+            </button>
 
-          {/* Code Viewer */}
-          <div className="flex-1 bg-[#07090E] border border-white/[0.08] rounded-xl p-4 font-mono text-xs text-slate-200 overflow-y-auto max-h-[480px]">
-            <pre className="whitespace-pre leading-relaxed text-amber-100/90">{currentCode}</pre>
+            <button
+              onClick={handleDownloadCode}
+              className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-[#F59E0B]/20 hover:bg-[#F59E0B]/30 text-[#F59E0B] text-xs font-bold transition-colors border border-[#F59E0B]/40"
+            >
+              <Download className="w-4 h-4" />
+              <span>Export Stack</span>
+            </button>
           </div>
+        </div>
 
-          <div className="mt-4 p-3 rounded-xl bg-[#0B111B] border border-white/[0.06] text-xs font-mono text-slate-400 flex items-center justify-between">
-            <span className="text-[#FF9900] font-semibold">
-              {codeMode === 'terraform' ? '$ terraform apply' : codeMode === 'cdk' ? '$ cdk deploy' : '$ pulumi up'}
-            </span>
-            <span className="text-emerald-400 font-semibold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-              Free Tier Verified
-            </span>
-          </div>
+        {/* Code Editor Preview */}
+        <div className="bg-[#050508] border border-white/[0.08] rounded-2xl p-6 font-mono text-xs text-slate-200 max-h-[440px] overflow-y-auto">
+          <pre className="whitespace-pre leading-relaxed text-amber-100/90">{currentCode}</pre>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-xs font-mono text-slate-400 flex items-center justify-between">
+          <span className="text-[#F59E0B] font-bold">
+            {codeMode === 'terraform' ? '$ terraform init && terraform apply' : codeMode === 'cdk' ? '$ cdk deploy' : '$ pulumi up'}
+          </span>
+          <span className="text-[#30D158] font-bold flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#30D158]"></span>
+            100% Free Tier Compatible
+          </span>
         </div>
       </div>
     </div>

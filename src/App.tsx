@@ -15,15 +15,15 @@ export function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
 
   return (
-    <div className="min-h-screen bg-[#0A101D] text-slate-100 flex flex-col font-sans selection:bg-[#FF9900] selection:text-slate-950">
-      {/* Command Palette Modal */}
+    <div className="min-h-screen bg-[#030305] text-[#F5F5F7] flex flex-col font-sans selection:bg-[#F59E0B] selection:text-black antialiased">
+      {/* Universal Command Palette Modal */}
       <CommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         onSelectTab={(tab) => setActiveTab(tab)}
       />
 
-      {/* Navigation Header */}
+      {/* Apple Floating Navigation Header */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -32,8 +32,8 @@ export function App() {
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
 
-      {/* Main Studio Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* Main Spacious Studio Workspace */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-10 py-12 sm:py-16">
         {activeTab === 'studio' && (
           <ArchitectureStudio selectedRegion={selectedRegion} />
         )}
@@ -54,31 +54,31 @@ export function App() {
         )}
       </main>
 
-      {/* Production Footer */}
-      <footer className="border-t border-white/[0.08] bg-[#070B12] py-8 mt-16 text-xs text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-6 h-6 rounded-md bg-[#FF9900]/20 flex items-center justify-center text-[#FF9900]">
-              <Cloud className="w-3.5 h-3.5" />
+      {/* Apple Pro Production Footer */}
+      <footer className="border-t border-white/[0.06] bg-black/60 py-10 mt-20 text-xs text-slate-400">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-7 h-7 rounded-xl bg-[#F59E0B]/15 flex items-center justify-center text-[#F59E0B]">
+              <Cloud className="w-4 h-4" />
             </div>
-            <span className="font-bold text-slate-200">CloudPulse AI</span>
-            <span className="text-slate-500">—</span>
+            <span className="font-extrabold text-white text-sm">CloudPulse AI</span>
+            <span className="text-slate-600">—</span>
             <span className="text-slate-400">AWS Weekend Challenge Production Stack</span>
           </div>
 
-          <div className="flex items-center space-x-4 font-mono text-xs">
-            <span className="flex items-center gap-2 text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div className="flex items-center space-x-5 font-mono text-xs">
+            <span className="flex items-center gap-2 text-[#30D158] font-bold">
+              <span className="w-2 h-2 rounded-full bg-[#30D158] animate-pulse"></span>
               Live: CloudFront + Graviton3 Lambda
             </span>
             <span className="text-slate-600">•</span>
-            <span className="text-slate-300 font-bold">$0.00 / mo Free Tier</span>
+            <span className="text-slate-200 font-bold">$0.00 / mo Free Tier</span>
             <span className="text-slate-600">•</span>
             <a 
               href="https://github.com/RamSuryaCH/cloudpulse-aws" 
               target="_blank" 
               rel="noreferrer"
-              className="text-[#FF9900] hover:underline font-semibold"
+              className="text-[#F59E0B] hover:underline font-bold"
             >
               GitHub ↗
             </a>

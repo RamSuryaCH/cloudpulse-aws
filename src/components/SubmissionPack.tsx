@@ -41,10 +41,10 @@ Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
     navigator.clipboard.writeText(submissionText);
     setCopied(true);
     confetti({
-      particleCount: 140,
+      particleCount: 150,
       spread: 90,
-      origin: { y: 0.6 },
-      colors: ['#FF9900', '#539FE5', '#10B981', '#FFFFFF', '#EC7211']
+      origin: { y: 0.5 },
+      colors: ['#F59E0B', '#30D158', '#0A84FF', '#FFFFFF', '#D97706']
     });
     setTimeout(() => setCopied(false), 2500);
   };
@@ -57,29 +57,29 @@ Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Hero Banner */}
-      <div className="aws-card p-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-[#FF9900]/20 text-[#FF9900] border border-[#FF9900]/40 flex items-center justify-center">
-                <Award className="w-6 h-6 stroke-[2.2]" />
+      <div className="apple-card p-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/40 flex items-center justify-center">
+                <Award className="w-7 h-7 stroke-[2.2]" />
               </div>
-              <h2 className="text-2xl font-extrabold text-white tracking-tight">Official Challenge Submission Pack</h2>
+              <h2 className="text-3xl font-black text-white tracking-tight">Official Challenge Submission Pack</h2>
             </div>
             <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Formatted according to the AWS Weekend Challenge submission requirements with live endpoints. Copy the post content directly to submit!
+              Formatted according to the AWS Weekend Challenge submission requirements with verified live endpoints. Copy the post content directly to submit!
             </p>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
             <a
               href="https://d1pugni5iia6hw.cloudfront.net"
               target="_blank"
               rel="noreferrer"
               onClick={() => sounds.playClick()}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#141F30] hover:bg-[#1E2D44] text-slate-200 font-semibold text-xs border border-white/[0.08] transition-all"
+              className="flex items-center space-x-2 px-5 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-white font-bold text-xs border border-white/[0.08] transition-all"
             >
               <ExternalLink className="w-4 h-4" />
               <span>Open CloudFront URL</span>
@@ -87,9 +87,9 @@ Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
 
             <button
               onClick={handleCopySubmission}
-              className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF9900] to-[#EC7211] hover:from-[#FFA726] hover:to-[#FF9900] text-slate-950 font-bold text-xs shadow-lg shadow-[#FF9900]/25 transition-all active:scale-95 duration-150"
+              className="flex items-center space-x-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#FBBF24] hover:to-[#F59E0B] text-black font-black text-xs shadow-xl shadow-[#F59E0B]/25 transition-all active:scale-95 duration-150 cursor-pointer"
             >
-              {copied ? <Check className="w-4 h-4 text-slate-950 stroke-[2.5]" /> : <Copy className="w-4 h-4 text-slate-950 stroke-[2.5]" />}
+              {copied ? <Check className="w-4 h-4 text-black stroke-[2.5]" /> : <Copy className="w-4 h-4 text-black stroke-[2.5]" />}
               <span>{copied ? 'Copied to Clipboard! 🎉' : 'Copy Submission Post'}</span>
             </button>
           </div>
@@ -97,56 +97,56 @@ Total Monthly Cost: $0.00 (100% Covered by AWS Free Tier) 💸`;
       </div>
 
       {/* Content Preview & Deployment Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Formatted Post Content */}
-        <div className="lg:col-span-8 aws-card p-7 flex flex-col">
-          <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-100 flex items-center gap-2">
-              <FileCode className="w-4 h-4 text-[#FF9900]" />
+        <div className="lg:col-span-8 apple-card p-8 flex flex-col">
+          <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-5">
+            <h3 className="text-base font-bold uppercase tracking-wider text-white flex items-center gap-2.5 font-mono">
+              <FileCode className="w-5 h-5 text-[#F59E0B]" />
               Submission Post Markdown Preview
             </h3>
-            <span className="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/30 font-bold">
+            <span className="text-xs text-[#30D158] font-mono bg-[#30D158]/10 px-3.5 py-1 rounded-full border border-[#30D158]/30 font-bold">
               100% Ready
             </span>
           </div>
 
-          <div className="flex-1 bg-[#07090E] border border-white/[0.08] rounded-2xl p-5 font-mono text-xs text-slate-200 leading-relaxed overflow-y-auto max-h-[520px]">
+          <div className="flex-1 bg-[#050508] border border-white/[0.08] rounded-3xl p-6 font-mono text-xs text-slate-200 leading-relaxed overflow-y-auto max-h-[520px]">
             <pre className="whitespace-pre-wrap font-mono text-slate-200">{submissionText}</pre>
           </div>
         </div>
 
         {/* Right: CloudFormation CLI Command & Badges */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="aws-card p-7 space-y-5">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-100 flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-[#FF9900]" />
-              1-Click AWS Deploy Command
+        <div className="lg:col-span-4 space-y-8">
+          <div className="apple-card p-8 space-y-6">
+            <h3 className="text-base font-bold uppercase tracking-wider text-white flex items-center gap-2.5 font-mono">
+              <Terminal className="w-5 h-5 text-[#F59E0B]" />
+              1-Click AWS Deploy
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed">
               Infrastructure provisioned with S3 OAC, API Gateway v2, and Graviton3 Lambda:
             </p>
 
-            <div className="p-3 bg-[#07090E] border border-white/[0.08] rounded-xl flex items-center justify-between text-xs font-mono">
-              <span className="text-[#FF9900] truncate">aws cloudformation deploy...</span>
+            <div className="p-4 bg-[#050508] border border-white/[0.08] rounded-2xl flex items-center justify-between text-xs font-mono">
+              <span className="text-[#F59E0B] truncate font-bold">aws cloudformation deploy...</span>
               <button
                 onClick={handleCopyDeployCmd}
-                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                className="p-2 rounded-xl hover:bg-white/[0.1] text-slate-400 hover:text-white transition-colors"
                 title="Copy command"
               >
-                {copiedCmd ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                {copiedCmd ? <Check className="w-4 h-4 text-[#30D158]" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
 
-            <div className="pt-3 border-t border-white/[0.08] text-xs text-slate-300 space-y-2.5 font-medium">
-              <div className="flex items-center space-x-2 text-emerald-400">
+            <div className="pt-4 border-t border-white/[0.08] text-xs text-slate-300 space-y-3 font-semibold">
+              <div className="flex items-center space-x-2.5 text-[#30D158]">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Zero Server Maintenance (Serverless)</span>
               </div>
-              <div className="flex items-center space-x-2 text-emerald-400">
+              <div className="flex items-center space-x-2.5 text-[#30D158]">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>$0.00 / mo Free Tier Verified</span>
               </div>
-              <div className="flex items-center space-x-2 text-emerald-400">
+              <div className="flex items-center space-x-2.5 text-[#30D158]">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>GitHub Actions CI/CD Pipeline Included</span>
               </div>

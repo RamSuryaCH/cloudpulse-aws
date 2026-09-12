@@ -144,109 +144,103 @@ export const TelemetryHub: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Header & Overview */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/[0.06]">
-        <div>
-          <div className="flex items-center space-x-2 text-[#FF9900] text-xs font-mono font-semibold uppercase tracking-wider mb-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Full-Stack CloudWatch & X-Ray Observability</span>
-          </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">Live Telemetry & Logs</h1>
-          <p className="text-sm text-slate-300 mt-1 max-w-2xl">
-            Live interactive API console connecting directly to AWS API Gateway v2 and Graviton3 Lambda with CloudWatch log stream telemetry.
-          </p>
+      <div className="space-y-3 max-w-3xl">
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-[#F59E0B] text-xs font-mono font-semibold">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Full-Stack CloudWatch & X-Ray Observability</span>
         </div>
-        <div className="flex items-center space-x-3 text-xs font-mono">
-          <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            CloudWatch Connected
-          </span>
-        </div>
+        <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+          Live Telemetry & Logs
+        </h1>
+        <p className="text-base text-slate-400 leading-relaxed">
+          Interactive API console connecting directly to AWS API Gateway v2 and Graviton3 Lambda with live CloudWatch streaming logs.
+        </p>
       </div>
 
-      {/* 4 Large Apple-Grade KPI Cards with Sparklines */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="aws-card p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+      {/* 4 Large Apple-Grade KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="apple-card p-8">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between font-mono">
             <span>Total Invocations</span>
-            <div className="w-8 h-8 rounded-lg bg-[#FF9900]/15 border border-[#FF9900]/30 flex items-center justify-center text-[#FF9900]">
-              <Activity className="w-4 h-4 stroke-[2.5]" />
+            <div className="w-9 h-9 rounded-xl bg-[#F59E0B]/15 border border-[#F59E0B]/30 flex items-center justify-center text-[#F59E0B]">
+              <Activity className="w-5 h-5 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-4xl font-extrabold text-white font-mono tracking-tight">
-            {invocationsCount.toLocaleString()} <span className="text-sm text-emerald-400 font-normal">reqs</span>
+          <div className="text-4xl sm:text-5xl font-black text-white font-mono tracking-tight">
+            {invocationsCount.toLocaleString()}
           </div>
-          <div className="text-xs text-slate-300 mt-2.5">
+          <div className="text-xs text-slate-400 mt-3 font-mono">
             HTTP API + Graviton3 Lambda
           </div>
         </div>
 
-        <div className="aws-card p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+        <div className="apple-card p-8">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between font-mono">
             <span>Average P95 Latency</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <Clock className="w-4 h-4 stroke-[2.5]" />
+            <div className="w-9 h-9 rounded-xl bg-[#30D158]/15 border border-[#30D158]/30 flex items-center justify-center text-[#30D158]">
+              <Clock className="w-5 h-5 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-4xl font-extrabold text-emerald-400 font-mono tracking-tight">
-            {avgLatency} <span className="text-sm text-slate-400 font-normal">ms</span>
+          <div className="text-4xl sm:text-5xl font-black text-[#30D158] font-mono tracking-tight">
+            {avgLatency} <span className="text-base text-slate-400 font-normal">ms</span>
           </div>
-          {/* Latency histogram sparkline */}
-          <div className="flex items-end space-x-1 mt-2.5 h-6">
+          {/* Latency Sparkline */}
+          <div className="flex items-end space-x-1.5 mt-3 h-8">
             {latencyHistory.map((l, i) => (
               <div
                 key={i}
-                style={{ height: `${Math.min(100, Math.max(20, (l / 35) * 100))}%` }}
-                className="flex-1 bg-emerald-400/60 rounded-t-sm transition-all duration-300 hover:bg-emerald-400"
+                style={{ height: `${Math.min(100, Math.max(25, (l / 35) * 100))}%` }}
+                className="flex-1 bg-[#30D158]/60 rounded-t-md transition-all duration-300 hover:bg-[#30D158]"
                 title={`${l}ms`}
               />
             ))}
           </div>
         </div>
 
-        <div className="aws-card p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+        <div className="apple-card p-8">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between font-mono">
             <span>Edge Cache Hit Rate</span>
-            <div className="w-8 h-8 rounded-lg bg-[#539FE5]/15 border border-[#539FE5]/30 flex items-center justify-center text-[#539FE5]">
-              <Zap className="w-4 h-4 stroke-[2.5]" />
+            <div className="w-9 h-9 rounded-xl bg-[#0A84FF]/15 border border-[#0A84FF]/30 flex items-center justify-center text-[#0A84FF]">
+              <Zap className="w-5 h-5 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-4xl font-extrabold text-[#539FE5] font-mono tracking-tight">
-            99.2% <span className="text-sm text-slate-400 font-normal">hit</span>
+          <div className="text-4xl sm:text-5xl font-black text-[#0A84FF] font-mono tracking-tight">
+            99.2%
           </div>
-          <div className="text-xs text-slate-300 mt-2.5">
+          <div className="text-xs text-slate-400 mt-3 font-mono">
             CloudFront 600+ Global POPs
           </div>
         </div>
 
-        <div className="aws-card p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+        <div className="apple-card p-8">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between font-mono">
             <span>System Error Rate</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <Shield className="w-4 h-4 stroke-[2.5]" />
+            <div className="w-9 h-9 rounded-xl bg-[#30D158]/15 border border-[#30D158]/30 flex items-center justify-center text-[#30D158]">
+              <Shield className="w-5 h-5 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-4xl font-extrabold text-emerald-400 font-mono tracking-tight">
-            0.00% <span className="text-sm text-slate-400 font-normal">errors</span>
+          <div className="text-4xl sm:text-5xl font-black text-[#30D158] font-mono tracking-tight">
+            0.00%
           </div>
-          <div className="text-xs text-slate-300 mt-2.5">
+          <div className="text-xs text-slate-400 mt-3 font-mono">
             Zero 4xx / 5xx HTTP faults
           </div>
         </div>
       </div>
 
       {/* Main Studio Console: API Invoker & Log Stream */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Interactive API Invoker */}
-        <div className="lg:col-span-6 aws-card p-7 space-y-6">
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Send className="w-5 h-5 text-[#FF9900]" />
+        <div className="lg:col-span-6 apple-card p-8 space-y-6">
+          <div className="flex items-center justify-between border-b border-white/[0.08] pb-5">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2.5">
+              <Send className="w-5 h-5 text-[#F59E0B]" />
               Live AWS API Gateway Invoker
             </h3>
-            <span className="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">
-              HTTPS Live
+            <span className="text-xs text-[#30D158] font-mono bg-[#30D158]/10 px-3 py-1 rounded-full border border-[#30D158]/30 font-bold">
+              HTTPS 200 OK
             </span>
           </div>
 
@@ -259,7 +253,7 @@ export const TelemetryHub: React.FC = () => {
                   setRequestMethod(e.target.value as 'GET' | 'POST');
                 }}
                 aria-label="HTTP Method"
-                className="bg-[#0B111B] border border-white/[0.08] text-[#FF9900] font-mono text-xs font-bold px-3 py-2.5 rounded-xl focus:outline-none cursor-pointer"
+                className="bg-white/[0.04] border border-white/[0.08] text-[#F59E0B] font-mono text-xs font-bold px-4 py-3 rounded-2xl focus:outline-none cursor-pointer"
               >
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
@@ -272,7 +266,7 @@ export const TelemetryHub: React.FC = () => {
                   setSelectedEndpoint(e.target.value);
                 }}
                 aria-label="API Endpoint"
-                className="flex-1 bg-[#0B111B] border border-white/[0.08] text-slate-200 font-mono text-xs px-3.5 py-2.5 rounded-xl focus:outline-none cursor-pointer"
+                className="flex-1 bg-white/[0.04] border border-white/[0.08] text-white font-mono text-xs px-4 py-3 rounded-2xl focus:outline-none cursor-pointer"
               >
                 <option value="/api/health">/api/health (Graviton3 Lambda Handler)</option>
                 <option value="/api/challenge/status">/api/challenge/status (DynamoDB Read)</option>
@@ -282,9 +276,9 @@ export const TelemetryHub: React.FC = () => {
               <button
                 onClick={handleInvokeApi}
                 disabled={isExecuting}
-                className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF9900] to-[#EC7211] hover:from-[#FFA726] hover:to-[#FF9900] text-slate-950 font-bold text-xs shadow-md shadow-[#FF9900]/25 transition-all active:scale-95 disabled:opacity-50"
+                className="flex items-center space-x-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#FBBF24] hover:to-[#F59E0B] text-black font-extrabold text-xs shadow-lg shadow-[#F59E0B]/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
               >
-                <Play className={`w-3.5 h-3.5 ${isExecuting ? 'animate-spin' : 'fill-current'}`} />
+                <Play className={`w-4 h-4 ${isExecuting ? 'animate-spin' : 'fill-current'}`} />
                 <span>{isExecuting ? 'Calling...' : 'Invoke'}</span>
               </button>
             </div>
@@ -298,28 +292,28 @@ export const TelemetryHub: React.FC = () => {
                     onClick={handleCopyCurl}
                     className="text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
                   >
-                    {copiedCurl ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    {copiedCurl ? <Check className="w-3.5 h-3.5 text-[#30D158]" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedCurl ? 'cURL Copied' : 'Copy cURL'}</span>
                   </button>
-                  <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span className="text-[#30D158] font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-4 h-4" />
                     Status {lastResponse.status} {lastResponse.statusText} ({lastResponse.latencyMs}ms)
                   </span>
                 </div>
               </div>
 
-              <div className="bg-[#07090E] border border-white/[0.08] rounded-xl p-4 font-mono text-xs text-slate-200 max-h-[340px] overflow-y-auto">
-                <pre className="whitespace-pre-wrap text-[#539FE5]">{JSON.stringify(lastResponse, null, 2)}</pre>
+              <div className="bg-[#050508] border border-white/[0.08] rounded-2xl p-5 font-mono text-xs text-slate-200 max-h-[340px] overflow-y-auto">
+                <pre className="whitespace-pre-wrap text-[#0A84FF]">{JSON.stringify(lastResponse, null, 2)}</pre>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-[#0B111B] border border-white/[0.06] text-xs font-mono text-slate-400 grid grid-cols-2 gap-2">
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs font-mono text-slate-400 grid grid-cols-2 gap-2">
                 <div>
                   <span className="text-slate-500">Edge POP:</span>
-                  <p className="text-slate-200 mt-0.5">{lastResponse.edgePop}</p>
+                  <p className="text-white mt-0.5 font-bold">{lastResponse.edgePop}</p>
                 </div>
                 <div>
                   <span className="text-slate-500">Compute Runtime:</span>
-                  <p className="text-[#FF9900] mt-0.5">{lastResponse.serverlessRuntime}</p>
+                  <p className="text-[#F59E0B] mt-0.5 font-bold">{lastResponse.serverlessRuntime}</p>
                 </div>
               </div>
             </div>
@@ -327,11 +321,11 @@ export const TelemetryHub: React.FC = () => {
         </div>
 
         {/* Right: Live CloudWatch Structured Logs Console */}
-        <div className="lg:col-span-6 aws-card p-7 space-y-6 flex flex-col h-full">
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Terminal className="w-5 h-5 text-[#FF9900]" />
-              Amazon CloudWatch Structured Log Stream
+        <div className="lg:col-span-6 apple-card p-8 space-y-6 flex flex-col h-full">
+          <div className="flex items-center justify-between border-b border-white/[0.08] pb-5">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2.5">
+              <Terminal className="w-5 h-5 text-[#F59E0B]" />
+              Amazon CloudWatch Structured Stream
             </h3>
             <span className="text-xs font-mono text-slate-400">
               Group: /aws/lambda/api
@@ -339,25 +333,25 @@ export const TelemetryHub: React.FC = () => {
           </div>
 
           {/* Terminal Box */}
-          <div className="flex-1 bg-[#07090E] border border-white/[0.08] rounded-2xl p-4 font-mono text-xs text-slate-300 overflow-y-auto max-h-[480px] space-y-2.5">
+          <div className="flex-1 bg-[#050508] border border-white/[0.08] rounded-3xl p-5 font-mono text-xs text-slate-300 overflow-y-auto max-h-[480px] space-y-3">
             {logs.map((log) => (
-              <div key={log.id} className="p-2.5 rounded-lg bg-[#0B111B]/80 border border-white/[0.04] space-y-1">
+              <div key={log.id} className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] space-y-1.5">
                 <div className="flex items-center justify-between text-[11px] text-slate-400">
                   <span className="text-slate-500">{log.timestamp}</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                     log.level === 'METRIC' 
-                      ? 'bg-[#539FE5]/15 text-[#539FE5]' 
-                      : 'bg-emerald-500/15 text-emerald-400'
+                      ? 'bg-[#0A84FF]/15 text-[#0A84FF]' 
+                      : 'bg-[#30D158]/15 text-[#30D158]'
                   }`}>
                     {log.level}
                   </span>
                 </div>
                 <div className="text-slate-200 text-xs leading-relaxed">
-                  <span className="text-[#FF9900] font-semibold">[{log.service}]</span> {log.message}
+                  <span className="text-[#F59E0B] font-bold">[{log.service}]</span> {log.message}
                 </div>
                 {log.latencyMs && (
-                  <div className="text-[10px] text-slate-400 flex items-center gap-3 pt-0.5">
-                    <span>Latency: <strong className="text-emerald-400">{log.latencyMs}ms</strong></span>
+                  <div className="text-[11px] text-slate-400 flex items-center gap-3 pt-1">
+                    <span>Latency: <strong className="text-[#30D158]">{log.latencyMs}ms</strong></span>
                     <span>ReqId: <strong className="text-slate-300">{log.requestId}</strong></span>
                   </div>
                 )}
@@ -365,9 +359,9 @@ export const TelemetryHub: React.FC = () => {
             ))}
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#0B111B] border border-white/[0.06] text-xs font-mono text-slate-400 flex items-center justify-between">
-            <span className="text-[#FF9900]">AWS CloudWatch Log Insights Active</span>
-            <span className="text-emerald-400 font-semibold">Retention: 30 Days</span>
+          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs font-mono text-slate-400 flex items-center justify-between">
+            <span className="text-[#F59E0B] font-bold">AWS CloudWatch Log Insights Active</span>
+            <span className="text-[#30D158] font-bold">Retention: 30 Days</span>
           </div>
         </div>
       </div>

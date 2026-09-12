@@ -56,109 +56,104 @@ export const CostOptimizer: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Header & Overview */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/[0.06]">
-        <div>
-          <div className="flex items-center space-x-2 text-[#FF9900] text-xs font-mono font-semibold uppercase tracking-wider mb-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Real-Time FinOps & Free-Tier Governance</span>
-          </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">AWS Cost & Free-Tier Guard</h1>
-          <p className="text-sm text-slate-300 mt-1 max-w-2xl">
-            Model real AWS billing metrics, verify 100% Free-Tier eligibility, and calculate serverless savings vs traditional EC2 architecture.
-          </p>
+      <div className="space-y-3 max-w-3xl">
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-[#F59E0B] text-xs font-mono font-semibold">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Real-Time FinOps & Free-Tier Intelligence</span>
         </div>
-        <div className="flex items-center space-x-3 text-xs font-mono">
-          <span className="px-3 py-1.5 rounded-xl bg-[#0F1B2A] border border-white/[0.08] text-slate-300">
-            Free Tier Quota: <span className="text-emerald-400 font-bold">1M Req/mo Free</span>
-          </span>
-        </div>
+        <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+          AWS Cost & Free-Tier Guard
+        </h1>
+        <p className="text-base text-slate-400 leading-relaxed">
+          Model real AWS billing metrics, calculate serverless compute savings vs traditional EC2, and verify 100% Free-Tier eligibility.
+        </p>
       </div>
 
       {/* 4 Large Apple-Grade Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="aws-card p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
-            <span>Monthly AWS Spend</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <DollarSign className="w-4 h-4 stroke-[2.5]" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="apple-card p-8">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between font-mono">
+            <span>Estimated Spend</span>
+            <div className="w-9 h-9 rounded-xl bg-[#30D158]/15 border border-[#30D158]/30 flex items-center justify-center text-[#30D158]">
+              <DollarSign className="w-5 h-5 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-4xl font-extrabold text-emerald-400 font-mono tracking-tight">
-            ${totalMonthlyCost.toFixed(2)} <span className="text-sm text-slate-400 font-normal">/ mo</span>
+          <div className="text-4xl sm:text-5xl font-black text-[#30D158] font-mono tracking-tight">
+            ${totalMonthlyCost.toFixed(2)}
           </div>
-          <div className="text-xs text-emerald-300 mt-2.5 flex items-center gap-1.5 font-medium">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <div className="text-xs text-[#30D158] mt-3 flex items-center gap-1.5 font-bold">
+            <CheckCircle2 className="w-4 h-4" />
             <span>100% Free-Tier Covered</span>
           </div>
         </div>
 
-        <div className="aws-card p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
-            <span>Serverless vs EC2 Savings</span>
-            <div className="w-8 h-8 rounded-lg bg-[#FF9900]/15 border border-[#FF9900]/30 flex items-center justify-center text-[#FF9900]">
-              <TrendingDown className="w-4 h-4 stroke-[2.5]" />
+        <div className="apple-card p-8">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between font-mono">
+            <span>Serverless Savings</span>
+            <div className="w-9 h-9 rounded-xl bg-[#F59E0B]/15 border border-[#F59E0B]/30 flex items-center justify-center text-[#F59E0B]">
+              <TrendingDown className="w-5 h-5 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-4xl font-extrabold text-[#FF9900] font-mono tracking-tight">
-            ${monthlySavings.toFixed(2)} <span className="text-sm text-slate-400 font-normal">/ mo</span>
+          <div className="text-4xl sm:text-5xl font-black text-[#F59E0B] font-mono tracking-tight">
+            ${monthlySavings.toFixed(2)}
           </div>
-          <div className="text-xs text-slate-300 mt-2.5 font-mono">
+          <div className="text-xs text-slate-300 mt-3 font-mono">
             ~${annualSavings.toFixed(0)} saved per year
           </div>
         </div>
 
-        <div className="aws-card p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
-            <span>Free Tier Capacity</span>
-            <div className="w-8 h-8 rounded-lg bg-[#539FE5]/15 border border-[#539FE5]/30 flex items-center justify-center text-[#539FE5]">
-              <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
+        <div className="apple-card p-8">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between font-mono">
+            <span>Free Tier Buffer</span>
+            <div className="w-9 h-9 rounded-xl bg-[#0A84FF]/15 border border-[#0A84FF]/30 flex items-center justify-center text-[#0A84FF]">
+              <ShieldCheck className="w-5 h-5 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-4xl font-extrabold text-[#539FE5] font-mono tracking-tight">
-            {100 - freeTierReqPercent}% <span className="text-sm text-slate-400 font-normal">buffer</span>
+          <div className="text-4xl sm:text-5xl font-black text-[#0A84FF] font-mono tracking-tight">
+            {100 - freeTierReqPercent}%
           </div>
-          <div className="text-xs text-slate-300 mt-2.5 font-mono">
-            {params.monthlyRequests.toLocaleString()} of 1,000,000 reqs
+          <div className="text-xs text-slate-300 mt-3 font-mono">
+            {params.monthlyRequests.toLocaleString()} of 1M quota
           </div>
         </div>
 
-        <div className="aws-card p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+        <div className="apple-card p-8">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between font-mono">
             <span>Compute Architecture</span>
-            <div className="w-8 h-8 rounded-lg bg-[#EC7211]/15 border border-[#EC7211]/30 flex items-center justify-center text-[#EC7211]">
-              <Zap className="w-4 h-4 stroke-[2.5]" />
+            <div className="w-9 h-9 rounded-xl bg-[#F59E0B]/15 border border-[#F59E0B]/30 flex items-center justify-center text-[#F59E0B]">
+              <Zap className="w-5 h-5 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-4xl font-extrabold text-white font-mono tracking-tight">
-            Graviton3 <span className="text-xs text-[#FF9900] font-normal">ARM64</span>
+          <div className="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight">
+            Graviton3 <span className="text-sm text-[#F59E0B]">ARM64</span>
           </div>
-          <div className="text-xs text-slate-300 mt-2.5">
+          <div className="text-xs text-slate-300 mt-3">
             34% better price/performance
           </div>
         </div>
       </div>
 
       {/* Main Sliders and Interactive Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Interactive Usage Sliders */}
-        <div className="lg:col-span-7 aws-card p-7 space-y-6">
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-[#FF9900]" />
+        <div className="lg:col-span-7 apple-card p-8 space-y-8">
+          <div className="flex items-center justify-between border-b border-white/[0.08] pb-5">
+            <h3 className="text-lg font-extrabold text-white flex items-center gap-2.5">
+              <DollarSign className="w-5 h-5 text-[#F59E0B]" />
               Workload & Traffic Modeler
             </h3>
-            <span className="text-xs text-[#FF9900] font-mono bg-[#0B111B] px-3 py-1 rounded-lg border border-white/[0.08]">
-              Live Calculated
+            <span className="text-xs text-[#F59E0B] font-mono bg-white/[0.04] px-3.5 py-1 rounded-full border border-white/[0.08]">
+              Dynamic Projection
             </span>
           </div>
 
           {/* Slider 1: Monthly Requests */}
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-slate-200 font-medium">Monthly API & Page Requests:</span>
-              <span className="text-[#FF9900] font-mono font-bold text-base">{params.monthlyRequests.toLocaleString()} reqs</span>
+              <span className="text-slate-200 font-bold">Monthly API & Edge Requests:</span>
+              <span className="text-[#F59E0B] font-mono font-extrabold text-base">{params.monthlyRequests.toLocaleString()} reqs</span>
             </div>
             <input
               type="range"
@@ -170,20 +165,20 @@ export const CostOptimizer: React.FC = () => {
                 sounds.playClick();
                 setParams({ ...params, monthlyRequests: Number(e.target.value), lambdaExecutions: Number(e.target.value) });
               }}
-              className="w-full accent-[#FF9900] bg-[#0B111B] h-2.5 rounded-lg cursor-pointer"
+              className="w-full accent-[#F59E0B] bg-white/[0.06] h-3 rounded-full cursor-pointer"
             />
-            <div className="flex justify-between text-[11px] text-slate-400 font-mono">
+            <div className="flex justify-between text-xs text-slate-400 font-mono">
               <span>10K (Dev)</span>
-              <span className="text-emerald-400">1.0M (Free Tier Cap)</span>
-              <span>5.0M (High Scale)</span>
+              <span className="text-[#30D158] font-bold">1,000,000 (Free Tier Cap)</span>
+              <span>5,000,000 (High Scale)</span>
             </div>
           </div>
 
           {/* Slider 2: Storage */}
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-slate-200 font-medium">S3 Static Storage:</span>
-              <span className="text-[#FF9900] font-mono font-bold text-base">{params.storageGB} GB</span>
+              <span className="text-slate-200 font-bold">S3 Static Storage Volume:</span>
+              <span className="text-[#F59E0B] font-mono font-extrabold text-base">{params.storageGB} GB</span>
             </div>
             <input
               type="range"
@@ -194,20 +189,20 @@ export const CostOptimizer: React.FC = () => {
                 sounds.playClick();
                 setParams({ ...params, storageGB: Number(e.target.value) });
               }}
-              className="w-full accent-[#FF9900] bg-[#0B111B] h-2.5 rounded-lg cursor-pointer"
+              className="w-full accent-[#F59E0B] bg-white/[0.06] h-3 rounded-full cursor-pointer"
             />
-            <div className="flex justify-between text-[11px] text-slate-400 font-mono">
+            <div className="flex justify-between text-xs text-slate-400 font-mono">
               <span>1 GB</span>
-              <span className="text-emerald-400">5 GB (Free Tier)</span>
+              <span className="text-[#30D158] font-bold">5 GB (Free Tier Storage)</span>
               <span>50 GB</span>
             </div>
           </div>
 
           {/* Slider 3: CDN Bandwidth */}
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-slate-200 font-medium">CloudFront Global Egress Bandwidth:</span>
-              <span className="text-[#FF9900] font-mono font-bold text-base">{params.dataTransferGB} GB</span>
+              <span className="text-slate-200 font-bold">CloudFront Global Egress Bandwidth:</span>
+              <span className="text-[#F59E0B] font-mono font-extrabold text-base">{params.dataTransferGB} GB</span>
             </div>
             <input
               type="range"
@@ -219,20 +214,20 @@ export const CostOptimizer: React.FC = () => {
                 sounds.playClick();
                 setParams({ ...params, dataTransferGB: Number(e.target.value) });
               }}
-              className="w-full accent-[#FF9900] bg-[#0B111B] h-2.5 rounded-lg cursor-pointer"
+              className="w-full accent-[#F59E0B] bg-white/[0.06] h-3 rounded-full cursor-pointer"
             />
-            <div className="flex justify-between text-[11px] text-slate-400 font-mono">
+            <div className="flex justify-between text-xs text-slate-400 font-mono">
               <span>1 GB</span>
-              <span className="text-emerald-400">1,024 GB (1 TB Free Forever)</span>
+              <span className="text-[#30D158] font-bold">1,024 GB (1 TB Free Forever)</span>
               <span>1,500 GB</span>
             </div>
           </div>
 
           {/* Slider 4: Lambda Execution Duration */}
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-slate-200 font-medium">Lambda Average Execution Time:</span>
-              <span className="text-[#FF9900] font-mono font-bold text-base">{params.avgDurationMs} ms</span>
+              <span className="text-slate-200 font-bold">Lambda Average Execution Time:</span>
+              <span className="text-[#F59E0B] font-mono font-extrabold text-base">{params.avgDurationMs} ms</span>
             </div>
             <input
               type="range"
@@ -244,18 +239,18 @@ export const CostOptimizer: React.FC = () => {
                 sounds.playClick();
                 setParams({ ...params, avgDurationMs: Number(e.target.value) });
               }}
-              className="w-full accent-[#FF9900] bg-[#0B111B] h-2.5 rounded-lg cursor-pointer"
+              className="w-full accent-[#F59E0B] bg-white/[0.06] h-3 rounded-full cursor-pointer"
             />
-            <div className="flex justify-between text-[11px] text-slate-400 font-mono">
+            <div className="flex justify-between text-xs text-slate-400 font-mono">
               <span>10 ms (Graviton3 Fast)</span>
-              <span>85 ms (Standard)</span>
+              <span>85 ms (Standard API)</span>
               <span>500 ms</span>
             </div>
           </div>
 
-          {/* AWS Architecture Toggles */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/[0.08]">
-            <label className="flex items-center space-x-3 p-3.5 rounded-xl bg-[#0B111B] border border-white/[0.06] cursor-pointer hover:border-[#FF9900]/40 transition-colors">
+          {/* Architecture Toggles */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-white/[0.08]">
+            <label className="flex items-center space-x-3.5 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] cursor-pointer hover:border-[#F59E0B]/50 transition-colors">
               <input
                 type="checkbox"
                 checked={params.useFreeTier}
@@ -263,15 +258,15 @@ export const CostOptimizer: React.FC = () => {
                   sounds.playSwitch();
                   setParams({ ...params, useFreeTier: e.target.checked });
                 }}
-                className="w-4 h-4 rounded accent-[#FF9900]"
+                className="w-5 h-5 rounded accent-[#F59E0B]"
               />
               <div>
-                <span className="text-xs font-bold text-slate-200 block">Apply AWS Free Tier Discount</span>
-                <span className="text-[11px] text-slate-400">12 Months & Always-Free credits</span>
+                <span className="text-xs font-bold text-white block">Apply AWS Free Tier</span>
+                <span className="text-[11px] text-slate-400">12-Month & Always-Free credits</span>
               </div>
             </label>
 
-            <label className="flex items-center space-x-3 p-3.5 rounded-xl bg-[#0B111B] border border-white/[0.06] cursor-pointer hover:border-[#FF9900]/40 transition-colors">
+            <label className="flex items-center space-x-3.5 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] cursor-pointer hover:border-[#F59E0B]/50 transition-colors">
               <input
                 type="checkbox"
                 checked={params.useGraviton}
@@ -279,81 +274,80 @@ export const CostOptimizer: React.FC = () => {
                   sounds.playSwitch();
                   setParams({ ...params, useGraviton: e.target.checked });
                 }}
-                className="w-4 h-4 rounded accent-[#FF9900]"
+                className="w-5 h-5 rounded accent-[#F59E0B]"
               />
               <div>
-                <span className="text-xs font-bold text-slate-200 block">AWS Graviton3 ARM64 Compute</span>
+                <span className="text-xs font-bold text-white block">AWS Graviton3 ARM64</span>
                 <span className="text-[11px] text-slate-400">34% lower execution cost</span>
               </div>
             </label>
           </div>
         </div>
 
-        {/* Right: Cost Comparison & AWS Budget Guard */}
-        <div className="lg:col-span-5 space-y-6">
-          {/* Detailed AWS Service Cost Breakdown */}
-          <div className="aws-card p-6 space-y-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center justify-between">
-              <span>Detailed Service Cost Breakdown</span>
-              <span className="text-xs font-mono text-emerald-400 font-bold">${totalMonthlyCost.toFixed(2)}/mo</span>
+        {/* Right: Detailed Service Cost Breakdown & Budget Alert */}
+        <div className="lg:col-span-5 space-y-8">
+          <div className="apple-card p-8 space-y-5">
+            <h3 className="text-base font-bold uppercase tracking-wider text-slate-200 flex items-center justify-between font-mono">
+              <span>Service Cost Breakdown</span>
+              <span className="text-sm font-mono text-[#30D158] font-bold">${totalMonthlyCost.toFixed(2)}/mo</span>
             </h3>
 
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between items-center p-3 rounded-xl bg-[#0B111B] border border-white/[0.06]">
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-6 h-6 rounded-lg bg-[#539FE5]/15 text-[#539FE5] flex items-center justify-center font-bold text-[10px]">CF</div>
+            <div className="space-y-3.5 text-xs">
+              <div className="flex justify-between items-center p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#0A84FF]/15 text-[#0A84FF] flex items-center justify-center font-bold text-xs">CF</div>
                   <div>
-                    <span className="text-slate-200 font-semibold block">Amazon CloudFront</span>
-                    <span className="text-[10px] text-slate-400">1 TB Free Tier Egress</span>
+                    <span className="text-white font-bold block">Amazon CloudFront</span>
+                    <span className="text-[11px] text-slate-400">1 TB Free Tier Egress</span>
                   </div>
                 </div>
-                <span className="font-mono font-bold text-emerald-400">${cdnCost.toFixed(2)}</span>
+                <span className="font-mono font-bold text-[#30D158] text-sm">${cdnCost.toFixed(2)}</span>
               </div>
 
-              <div className="flex justify-between items-center p-3 rounded-xl bg-[#0B111B] border border-white/[0.06]">
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-6 h-6 rounded-lg bg-[#FF9900]/15 text-[#FF9900] flex items-center justify-center font-bold text-[10px]">S3</div>
+              <div className="flex justify-between items-center p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center font-bold text-xs">S3</div>
                   <div>
-                    <span className="text-slate-200 font-semibold block">Amazon S3 Storage</span>
-                    <span className="text-[10px] text-slate-400">5 GB Free Tier Storage</span>
+                    <span className="text-white font-bold block">Amazon S3 Storage</span>
+                    <span className="text-[11px] text-slate-400">5 GB Free Tier Storage</span>
                   </div>
                 </div>
-                <span className="font-mono font-bold text-emerald-400">${s3Cost.toFixed(2)}</span>
+                <span className="font-mono font-bold text-[#30D158] text-sm">${s3Cost.toFixed(2)}</span>
               </div>
 
-              <div className="flex justify-between items-center p-3 rounded-xl bg-[#0B111B] border border-white/[0.06]">
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-6 h-6 rounded-lg bg-[#EC7211]/15 text-[#EC7211] flex items-center justify-center font-bold text-[10px]">λ</div>
+              <div className="flex justify-between items-center p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center font-bold text-xs">λ</div>
                   <div>
-                    <span className="text-slate-200 font-semibold block">AWS Lambda (Graviton3)</span>
-                    <span className="text-[10px] text-slate-400">1M Free Invocations / mo</span>
+                    <span className="text-white font-bold block">AWS Lambda (Graviton3)</span>
+                    <span className="text-[11px] text-slate-400">1M Free Invocations / mo</span>
                   </div>
                 </div>
-                <span className="font-mono font-bold text-emerald-400">${lambdaComputeCost.toFixed(2)}</span>
+                <span className="font-mono font-bold text-[#30D158] text-sm">${lambdaComputeCost.toFixed(2)}</span>
               </div>
 
-              <div className="flex justify-between items-center p-3 rounded-xl bg-[#0B111B] border border-white/[0.06]">
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-6 h-6 rounded-lg bg-[#10B981]/15 text-[#10B981] flex items-center justify-center font-bold text-[10px]">DB</div>
+              <div className="flex justify-between items-center p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#30D158]/15 text-[#30D158] flex items-center justify-center font-bold text-xs">DB</div>
                   <div>
-                    <span className="text-slate-200 font-semibold block">Amazon DynamoDB</span>
-                    <span className="text-[10px] text-slate-400">25 GB On-Demand Free</span>
+                    <span className="text-white font-bold block">Amazon DynamoDB</span>
+                    <span className="text-[11px] text-slate-400">25 GB On-Demand Free</span>
                   </div>
                 </div>
-                <span className="font-mono font-bold text-emerald-400">${dynamoCost.toFixed(2)}</span>
+                <span className="font-mono font-bold text-[#30D158] text-sm">${dynamoCost.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
           {/* AWS Budget Guard with Test Trigger */}
-          <div className="aws-card p-6 space-y-4">
+          <div className="apple-card p-8 space-y-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                <BellRing className="w-4 h-4 text-[#FF9900]" />
-                <span>AWS Budget Guard Alert System</span>
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <BellRing className="w-5 h-5 text-[#F59E0B]" />
+                <span>AWS Budget Guard Alert</span>
               </h3>
-              <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
-                Active
+              <span className="text-xs font-mono text-[#30D158] bg-[#30D158]/10 px-3 py-1 rounded-full border border-[#30D158]/30 font-bold">
+                Active Guard
               </span>
             </div>
 
@@ -362,21 +356,21 @@ export const CostOptimizer: React.FC = () => {
             </p>
 
             <div className="flex items-center space-x-3">
-              <div className="flex-1 bg-[#0B111B] border border-white/[0.08] px-3 py-2 rounded-xl text-xs font-mono text-slate-200 flex items-center justify-between">
+              <div className="flex-1 bg-white/[0.03] border border-white/[0.08] px-4 py-3 rounded-2xl text-xs font-mono text-slate-200 flex items-center justify-between">
                 <span className="text-slate-400">Budget Limit:</span>
-                <span className="text-[#FF9900] font-bold">${budgetAlertLimit.toFixed(2)} / mo</span>
+                <span className="text-[#F59E0B] font-bold text-sm">${budgetAlertLimit.toFixed(2)} / mo</span>
               </div>
               <button
                 onClick={triggerBudgetTest}
-                className="px-4 py-2 rounded-xl bg-[#FF9900]/20 hover:bg-[#FF9900]/30 text-[#FF9900] text-xs font-bold transition-all border border-[#FF9900]/40 active:scale-95 whitespace-nowrap"
+                className="px-5 py-3 rounded-2xl bg-[#F59E0B]/20 hover:bg-[#F59E0B]/30 text-[#F59E0B] text-xs font-extrabold transition-all border border-[#F59E0B]/40 active:scale-95 whitespace-nowrap"
               >
                 Test Alert Guard
               </button>
             </div>
 
             {simulatedAlertTriggered && (
-              <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2 animate-bounce">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <div className="p-4 rounded-2xl bg-[#30D158]/15 border border-[#30D158]/30 text-xs text-[#30D158] flex items-center gap-2 animate-bounce font-medium">
+                <CheckCircle2 className="w-5 h-5" />
                 <span>Budget Simulation Verified: Alert SNS dispatched successfully with 0 spend breach!</span>
               </div>
             )}
