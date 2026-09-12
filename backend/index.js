@@ -1,18 +1,10 @@
 /**
- * CloudPulse AI — Lambda Handler
+ * CloudPulse AI & PrepWise Campus — Serverless Lambda Handler
  * Runtime: Node.js 20.x on AWS Graviton3 (ARM64)
  * Triggered by: Amazon API Gateway v2 (HTTP API AWS_PROXY)
- *
- * Routes:
- *   GET  /api/health                → health + AWS service map
- *   GET  /api/architectures         → list saved designs from DynamoDB
- *   POST /api/architectures/save    → persist architecture to DynamoDB (real CRUD)
- *   GET  /api/metrics               → live platform metrics via DynamoDB scan
- *   POST /api/audit                 → Well-Architected 6-pillar score
- *   GET  /api/status                → platform operational status
  */
 
-const { DynamoDBClient, PutItemCommand, ScanCommand } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBClient, PutItemCommand, ScanCommand, GetItemCommand, UpdateItemCommand } = require('@aws-sdk/client-dynamodb');
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 
 const TABLE_NAME = process.env.DYNAMODB_TABLE || 'cloudpulse-challenge-data';
@@ -27,24 +19,44 @@ const HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
   'X-Serverless-Runtime': 'Node.js 20.x Graviton3 (ARM64)',
   'X-CloudPulse-Region': REGION,
-  'X-Powered-By': 'CloudPulse AI'
+  'X-Powered-By': 'PrepWise Campus AI Platform'
 };
 
 const ok  = (body)                => ({ statusCode: 200, headers: HEADERS, body: JSON.stringify(body) });
 const bad = (code, msg, extra={}) => ({ statusCode: code, headers: HEADERS, body: JSON.stringify({ error: msg, ...extra }) });
 
+// Preset pricing map (Server-Side Source of Truth)
+const COURSE_PRICES = {
+  'eng-maths-3': 299,
+  'dsa': 349,
+  'digital-electronics': 299,
+  'dbms': 279,
+  'operating-systems': 319,
+  'organic-chem': 249
+};
+
+const PACKAGE_MULTIPLIERS = {
+  'one_on_one': 1.0,
+  'group_sprint': 0.85,
+  'subject_mastery': 2.1
+};
+
 exports.handler = async (event) => {
   const path   = event.rawPath || event.path || '/api/health';
   const method = (event.requestContext?.http?.method || event.httpMethod || 'GET').toUpperCase();
-  console.log(`[CloudPulse] ${method} ${path}`);
+  const query  = event.queryStringParameters || {};
+  console.log(`[PrepWise API] ${method} ${path}`);
 
   if (method === 'OPTIONS') return ok({ preflight: true });
 
   try {
-    // GET /api/health
+    // ─────────────────────────────────────────────
+    // 1. Health & Core AWS Route
+    // ─────────────────────────────────────────────
     if (path === '/api/health' && method === 'GET') {
       return ok({
         status: 'healthy',
+        service: 'PrepWise Campus & CloudPulse AI',
         timestamp: new Date().toISOString(),
         uptime: Math.round(process.uptime()),
         region: REGION,
@@ -61,133 +73,203 @@ exports.handler = async (event) => {
       });
     }
 
-    // GET /api/architectures — read from DynamoDB
-    if (path === '/api/architectures' && method === 'GET') {
-      const result = await ddb.send(new ScanCommand({
-        TableName: TABLE_NAME,
-        FilterExpression: 'begins_with(PK, :p)',
-        ExpressionAttributeValues: marshall({ ':p': 'ARCH#' }),
-        ProjectionExpression: 'PK, SK, #n, components, complianceScore, monthlyCost, createdAt',
-        ExpressionAttributeNames: { '#n': 'name' }
-      }));
-
-      const architectures = (result.Items || [])
-        .map(i => {
-          const u = unmarshall(i);
-          return {
-            id: u.SK, name: u.name, components: u.components || [],
-            complianceScore: u.complianceScore || 0, monthlyCost: u.monthlyCost || 0,
-            createdAt: u.createdAt
-          };
-        })
-        .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-
+    // ─────────────────────────────────────────────
+    // 2. PrepWise: GET /api/prepwise/courses
+    // ─────────────────────────────────────────────
+    if (path === '/api/prepwise/courses' && method === 'GET') {
       return ok({
-        count: architectures.length, architectures,
-        source: 'DynamoDB — ' + TABLE_NAME,
-        timestamp: new Date().toISOString()
+        status: 'success',
+        courses: [
+          { id: 'eng-maths-3', name: 'Engineering Mathematics III (PDE & Complex Variables)', code: 'MA301', category: 'engineering', basePricePerHour: 299 },
+          { id: 'dsa', name: 'Data Structures & Algorithms in C++/Java', code: 'CS201', category: 'computer_science', basePricePerHour: 349 },
+          { id: 'digital-electronics', name: 'Digital Logic & Microprocessors (8086/ARM)', code: 'EC204', category: 'electronics', basePricePerHour: 299 },
+          { id: 'dbms', name: 'Database Management Systems & SQL Querying', code: 'CS302', category: 'computer_science', basePricePerHour: 279 },
+          { id: 'operating-systems', name: 'Operating Systems & System Programming', code: 'CS304', category: 'computer_science', basePricePerHour: 319 },
+          { id: 'organic-chem', name: 'Engineering Chemistry & Spectroscopy', code: 'CH101', category: 'basic_sciences', basePricePerHour: 249 }
+        ]
       });
     }
 
-    // POST /api/architectures/save — write to DynamoDB
-    if (path === '/api/architectures/save' && method === 'POST') {
+    // ─────────────────────────────────────────────
+    // 3. PrepWise: POST /api/prepwise/sessions/create (Server-Side Price Calculation)
+    // ─────────────────────────────────────────────
+    if (path === '/api/prepwise/sessions/create' && method === 'POST') {
       const body = event.body ? JSON.parse(event.body) : {};
-      const { name, components = [], complianceScore = 0, monthlyCost = 0 } = body;
+      const { studentName, studentContact, collegeName, courseId, courseName, sessionType = 'one_on_one', referralCode } = body;
 
-      if (!name || !Array.isArray(components) || components.length === 0) {
-        return bad(400, 'Missing required fields', { required: ['name', 'components[]'] });
+      if (!studentName || !studentContact || !courseId) {
+        return bad(400, 'Missing required fields: studentName, studentContact, courseId');
       }
 
-      const id        = 'arch-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+      // Server-Side Price Calculation Guard (Never trust client totalAmount)
+      const basePrice = COURSE_PRICES[courseId] || 299;
+      const mult = PACKAGE_MULTIPLIERS[sessionType] || 1.0;
+      const totalAmount = Math.round(basePrice * mult);
+
+      // Financial breakdown: Tutor keeps 75%, Platform Net = 25%
+      const tutorEarnings = Math.round(totalAmount * 0.75 * 100) / 100;
+      const platformNet = Math.round(totalAmount * 0.25 * 100) / 100;
+      // If attributed to partner club, Club Share = 20% of Platform Net
+      const partnerClubShare = referralCode ? Math.round(platformNet * 0.20 * 100) / 100 : 0;
+
+      const sessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+      const publicToken = 'pw-tok-' + Math.random().toString(36).slice(2, 10);
       const createdAt = new Date().toISOString();
 
       await ddb.send(new PutItemCommand({
         TableName: TABLE_NAME,
         Item: marshall({
-          PK: 'ARCH#cloudpulse', SK: id,
-          name, components, complianceScore, monthlyCost, createdAt,
-          savedBy: 'CloudPulse AI Studio',
-          ttl: Math.floor(Date.now() / 1000) + (90 * 24 * 60 * 60)
+          PK: 'SESSION#prepwise',
+          SK: sessionId,
+          publicToken,
+          studentName,
+          studentContact,
+          collegeName: collegeName || 'Hyderbad Campus',
+          courseId,
+          courseName: courseName || courseId,
+          sessionType,
+          durationMins: sessionType === 'subject_mastery' ? 180 : 60,
+          totalAmount,
+          tutorEarnings,
+          platformNet,
+          partnerClubShare,
+          paymentStatus: 'pending',
+          sessionStatus: 'unassigned',
+          referralCode: referralCode || '',
+          createdAt,
+          ttl: Math.floor(Date.now() / 1000) + (180 * 24 * 60 * 60)
         })
       }));
 
-      console.log('[CloudPulse] Saved architecture "' + name + '" -> ' + id + ' -> ' + TABLE_NAME);
       return ok({
-        success: true, id, name, components, complianceScore, monthlyCost, createdAt,
-        dynamodbTable: TABLE_NAME,
-        message: 'Architecture "' + name + '" persisted to DynamoDB'
+        success: true,
+        sessionId,
+        publicToken,
+        totalAmount,
+        tutorEarnings,
+        platformNet,
+        paymentStatus: 'pending',
+        upiVpa: 'prepwise@upi',
+        message: 'Session booking created. Submit manual UPI payment reference to confirm.'
       });
     }
 
-    // GET /api/metrics — live stats from DynamoDB
-    if (path === '/api/metrics' && method === 'GET') {
-      const [all, archs] = await Promise.all([
-        ddb.send(new ScanCommand({ TableName: TABLE_NAME, Select: 'COUNT' })),
-        ddb.send(new ScanCommand({
-          TableName: TABLE_NAME, Select: 'COUNT',
-          FilterExpression: 'begins_with(PK, :p)',
-          ExpressionAttributeValues: marshall({ ':p': 'ARCH#' })
-        }))
-      ]);
+    // ─────────────────────────────────────────────
+    // 4. PrepWise: POST /api/prepwise/sessions/pay (Submit Manual UPI UTR)
+    // ─────────────────────────────────────────────
+    if (path === '/api/prepwise/sessions/pay' && method === 'POST') {
+      const body = event.body ? JSON.parse(event.body) : {};
+      const { publicToken, paymentRef } = body;
+
+      if (!publicToken || !paymentRef) {
+        return bad(400, 'Missing publicToken or paymentRef UTR reference');
+      }
+
+      const scanResult = await ddb.send(new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: 'publicToken = :tok',
+        ExpressionAttributeValues: marshall({ ':tok': publicToken })
+      }));
+
+      if (!scanResult.Items || scanResult.Items.length === 0) {
+        return bad(404, 'Booking session not found for token');
+      }
+
+      const item = unmarshall(scanResult.Items[0]);
+
+      await ddb.send(new UpdateItemCommand({
+        TableName: TABLE_NAME,
+        Key: marshall({ PK: item.PK, SK: item.SK }),
+        UpdateExpression: 'SET paymentStatus = :s, paymentRef = :r, submittedAt = :t',
+        ExpressionAttributeValues: marshall({
+          ':s': 'submitted',
+          ':r': paymentRef,
+          ':t': new Date().toISOString()
+        })
+      }));
 
       return ok({
-        timestamp: new Date().toISOString(),
-        dynamoDB: {
-          table: TABLE_NAME, totalRecords: all.Count || 0,
-          savedArchitectures: archs.Count || 0,
-          billingMode: 'PAY_PER_REQUEST', pitrEnabled: true
-        },
-        lambda: {
-          runtime: 'Node.js 20.x (ARM64 Graviton3)', region: REGION,
-          memoryMB: parseInt(process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE || '512'),
-          uptime: Math.round(process.uptime())
-        },
-        infrastructure: {
-          cloudfront: 'EJW28095DC509',
-          s3Bucket: 'cloudpulse-app-frontendbucket-arswr5lhouip',
-          apiGateway: 'pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com',
-          monthlySpend: 0.00, freeTierCoverage: '100%'
-        }
+        success: true,
+        publicToken,
+        paymentStatus: 'submitted',
+        paymentRef,
+        message: 'Manual UPI Reference submitted successfully. Awaiting Admin verification.'
       });
     }
 
-    // GET /api/status
-    if (path === '/api/status' && method === 'GET') {
-      return ok({
-        status: 'operational', timestamp: new Date().toISOString(),
-        uptime: Math.round(process.uptime()), region: REGION, dynamoDB: TABLE_NAME
-      });
+    // ─────────────────────────────────────────────
+    // 5. PrepWise: GET /api/prepwise/sessions/track?token=...
+    // ─────────────────────────────────────────────
+    if (path === '/api/prepwise/sessions/track' && method === 'GET') {
+      const token = query.token;
+      if (!token) return bad(400, 'Missing token parameter');
+
+      const scanResult = await ddb.send(new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: 'publicToken = :tok',
+        ExpressionAttributeValues: marshall({ ':tok': token })
+      }));
+
+      if (!scanResult.Items || scanResult.Items.length === 0) {
+        return bad(404, 'Booking session not found for this token');
+      }
+
+      const session = unmarshall(scanResult.Items[0]);
+      return ok({ success: true, session });
     }
 
-    // POST /api/audit
-    if (path === '/api/audit' && method === 'POST') {
-      const body     = event.body ? JSON.parse(event.body) : {};
-      const services = body.services || [];
-      const score    = services.length >= 4 ? 98 : Math.max(60, 72 + services.length * 6);
+    // ─────────────────────────────────────────────
+    // 6. PrepWise: ADMIN POST /api/prepwise/admin/verify-payment
+    // ─────────────────────────────────────────────
+    if (path === '/api/prepwise/admin/verify-payment' && method === 'POST') {
+      const body = event.body ? JSON.parse(event.body) : {};
+      const { sessionId, action = 'verify' } = body;
 
-      return ok({
-        score, grade: score >= 95 ? 'A+' : score >= 85 ? 'A' : 'B',
-        timestamp: new Date().toISOString(),
-        pillars: [
-          { name: 'Security',          score: 100, notes: 'OAC enforced, TLS 1.3, no public S3 access' },
-          { name: 'Reliability',       score: 99,  notes: 'Multi-AZ, DynamoDB PITR, CloudFront HA' },
-          { name: 'Performance',       score: 98,  notes: 'Graviton3 ARM64, sub-25ms, CDN edge cache' },
-          { name: 'Cost Optimization', score: 100, notes: '$0.00/mo — 100% within AWS Free Tier' },
-          { name: 'Operational',       score: 96,  notes: 'CloudWatch alarms, X-Ray tracing, structured logs' },
-          { name: 'Sustainability',    score: 95,  notes: 'Graviton3 = 60% lower energy vs x86_64' }
-        ],
-        overallStatus: 'PASSED', servicesAudited: services
-      });
+      if (!sessionId) return bad(400, 'Missing sessionId');
+
+      const newStatus = action === 'verify' ? 'verified' : 'rejected';
+
+      await ddb.send(new UpdateItemCommand({
+        TableName: TABLE_NAME,
+        Key: marshall({ PK: 'SESSION#prepwise', SK: sessionId }),
+        UpdateExpression: 'SET paymentStatus = :s, verifiedBy = :v, verifiedAt = :t',
+        ExpressionAttributeValues: marshall({
+          ':s': newStatus,
+          ':v': 'Admin (Console)',
+          ':t': new Date().toISOString()
+        })
+      }));
+
+      return ok({ success: true, sessionId, paymentStatus: newStatus });
     }
 
-    return bad(404, 'Route not found', {
-      requestedPath: path, method,
-      availableRoutes: ['GET /api/health','GET /api/architectures',
-        'POST /api/architectures/save','GET /api/metrics','GET /api/status','POST /api/audit']
-    });
+    // ─────────────────────────────────────────────
+    // 7. PrepWise: ADMIN POST /api/prepwise/admin/complete-session
+    // ─────────────────────────────────────────────
+    if (path === '/api/prepwise/admin/complete-session' && method === 'POST') {
+      const body = event.body ? JSON.parse(event.body) : {};
+      const { sessionId } = body;
+
+      if (!sessionId) return bad(400, 'Missing sessionId');
+
+      await ddb.send(new UpdateItemCommand({
+        TableName: TABLE_NAME,
+        Key: marshall({ PK: 'SESSION#prepwise', SK: sessionId }),
+        UpdateExpression: 'SET sessionStatus = :s, completedAt = :t',
+        ExpressionAttributeValues: marshall({
+          ':s': 'completed',
+          ':t': new Date().toISOString()
+        })
+      }));
+
+      return ok({ success: true, sessionId, sessionStatus: 'completed', message: 'Session completed. Tutor earnings unlocked.' });
+    }
+
+    // Fallback 404
+    return bad(404, 'Route not found', { requestedPath: path });
 
   } catch (error) {
-    console.error('[CloudPulse] Error:', error.name, error.message);
-    return bad(500, 'Internal serverless error', { message: error.message, type: error.name });
+    console.error('[PrepWise Error]:', error.name, error.message);
+    return bad(500, 'Internal serverless error', { message: error.message });
   }
 };
