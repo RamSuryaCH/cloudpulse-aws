@@ -1,13 +1,11 @@
-export type UITheme = 'aurora-bento' | 'cyberpunk' | 'swiss' | 'neobrutalism';
-
 export type AWSServiceCategory = 
   | 'compute' 
   | 'storage' 
   | 'database' 
   | 'networking' 
   | 'security' 
-  | 'analytics' 
-  | 'management';
+  | 'messaging' 
+  | 'observability';
 
 export interface AWSService {
   id: string;
@@ -20,6 +18,7 @@ export interface AWSService {
   pricingUnit: string;
   baseCost: number;
   tags: string[];
+  defaultConfig?: Record<string, any>;
 }
 
 export interface ArchitectureNode {
@@ -60,6 +59,7 @@ export interface SecurityAuditItem {
   status: 'passed' | 'warning' | 'failed';
   remediation: string;
   terraformSnippet?: string;
+  docUrl?: string;
 }
 
 export interface CostParameters {
@@ -68,6 +68,7 @@ export interface CostParameters {
   lambdaExecutions: number;
   avgDurationMs: number;
   dataTransferGB: number;
+  region: string;
   useFreeTier: boolean;
   useGraviton: boolean;
 }

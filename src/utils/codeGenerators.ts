@@ -4,8 +4,8 @@ export function generateTerraform(nodes: ArchitectureNode[], connections: Archit
   const serviceIds = new Set(nodes.map(n => n.serviceId));
 
   let tf = `# ==============================================================================
-# CloudPulse AI - Generated AWS Terraform Configuration
-# Provisioned Architecture: ${nodes.length} Nodes, ${connections.length} Connections
+# CloudPulse AI - Production AWS Terraform Infrastructure
+# Provisioned Nodes: ${nodes.length} | Connections: ${connections.length}
 # ==============================================================================
 
 terraform {
@@ -23,37 +23,37 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "CloudPulse-Challenge"
+      Project     = "CloudPulse-AI"
       Environment = var.environment
       ManagedBy   = "Terraform"
-      Challenge   = "AWS-Weekend-Deploy"
+      Challenge   = "AWS-Weekend-Challenge"
     }
   }
 }
 
 variable "aws_region" {
   type        = string
-  default     = "us-east-1"
-  description = "Primary AWS deployment region"
+  default     = "ap-southeast-2"
+  description = "Target AWS deployment region"
 }
 
 variable "environment" {
   type        = string
   default     = "production"
-  description = "Target deployment environment"
+  description = "Deployment environment"
 }
 
 variable "app_name" {
   type        = string
   default     = "cloudpulse-app"
-  description = "Application naming prefix"
+  description = "Resource prefix"
 }
 `;
 
   if (serviceIds.has('s3') || serviceIds.has('cloudfront')) {
     tf += `
 # ------------------------------------------------------------------------------
-# Amazon S3 Bucket (Static Web App Assets)
+# 1. Amazon S3 Bucket (Static Single Page Application)
 # ------------------------------------------------------------------------------
 resource "aws_s3_bucket" "frontend" {
   bucket_prefix = "\${var.app_name}-assets-"
@@ -82,7 +82,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "frontend" {
   if (serviceIds.has('cloudfront')) {
     tf += `
 # ------------------------------------------------------------------------------
-# Amazon CloudFront CDN Distribution (Origin Access Control)
+# 2. Amazon CloudFront Origin Access Control (OAC) & Global CDN
 # ------------------------------------------------------------------------------
 resource "aws_cloudfront_origin_access_control" "oac" {
   name                              = "\${var.app_name}-oac"
@@ -97,7 +97,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
   price_class         = "PriceClass_100"
-  comment             = "CloudPulse Edge CDN Distribution"
+  comment             = "CloudPulse AI Global Edge CDN"
 
   origin {
     domain_name              = aws_s3_bucket.frontend.bucket_regional_domain_name
@@ -142,25 +142,22 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 }
 
-# Attach S3 bucket policy allowing only CloudFront OAC
 resource "aws_s3_bucket_policy" "cdn_access" {
   bucket = aws_s3_bucket.frontend.id
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "AllowCloudFrontServicePrincipal"
-        Effect    = "Allow"
-        Principal = { Service = "cloudfront.amazonaws.com" }
-        Action    = "s3:GetObject"
-        Resource  = "\${aws_s3_bucket.frontend.arn}/*"
-        Condition = {
-          StringEquals = {
-            "AWS:SourceArn" = aws_cloudfront_distribution.cdn.arn
-          }
+    Statement = [{
+      Sid       = "AllowCloudFrontOAC"
+      Effect    = "Allow"
+      Principal = { Service = "cloudfront.amazonaws.com" }
+      Action    = "s3:GetObject"
+      Resource  = "\${aws_s3_bucket.frontend.arn}/*"
+      Condition = {
+        StringEquals = {
+          "AWS:SourceArn" = aws_cloudfront_distribution.cdn.arn
         }
       }
-    ]
+    }]
   })
 }
 `;
@@ -169,7 +166,7 @@ resource "aws_s3_bucket_policy" "cdn_access" {
   if (serviceIds.has('dynamodb')) {
     tf += `
 # ------------------------------------------------------------------------------
-# Amazon DynamoDB Table (Serverless On-Demand NoSQL)
+# 3. Amazon DynamoDB Serverless Table (On-Demand NoSQL)
 # ------------------------------------------------------------------------------
 resource "aws_dynamodb_table" "main_db" {
   name         = "\${var.app_name}-data"
@@ -206,7 +203,7 @@ resource "aws_dynamodb_table" "main_db" {
   if (serviceIds.has('lambda') || serviceIds.has('apigateway')) {
     tf += `
 # ------------------------------------------------------------------------------
-# AWS Lambda Serverless Compute (Graviton3 ARM64)
+# 4. AWS Lambda Compute (Graviton3 ARM64) & API Gateway v2
 # ------------------------------------------------------------------------------
 resource "aws_iam_role" "lambda_exec" {
   name = "\${var.app_name}-lambda-exec-role"
@@ -229,9 +226,9 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 }
 
 resource "aws_lambda_function" "api_handler" {
-  function_name = "\${var.app_name}-backend"
+  function_name = "\${var.app_name}-api"
   runtime       = "nodejs20.x"
-  architectures = ["arm64"] # Graviton3 - 34% better price/perf
+  architectures = ["arm64"] # Graviton3 ARM64
   handler       = "index.handler"
   role          = aws_iam_role.lambda_exec.arn
   timeout       = 10
@@ -242,15 +239,12 @@ resource "aws_lambda_function" "api_handler" {
 
   environment {
     variables = {
-      ENVIRONMENT = var.environment
+      ENVIRONMENT  = var.environment
       DYNAMO_TABLE = try(aws_dynamodb_table.main_db.name, "")
     }
   }
 }
 
-# ------------------------------------------------------------------------------
-# Amazon API Gateway v2 (HTTP API)
-# ------------------------------------------------------------------------------
 resource "aws_apigatewayv2_api" "http_api" {
   name          = "\${var.app_name}-http-api"
   protocol_type = "HTTP"
@@ -295,7 +289,7 @@ resource "aws_lambda_permission" "apigw_invoke" {
   if (serviceIds.has('cloudwatch')) {
     tf += `
 # ------------------------------------------------------------------------------
-# Amazon CloudWatch Telemetry & Health Alarm
+# 5. Amazon CloudWatch Metric Alarms
 # ------------------------------------------------------------------------------
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   alarm_name          = "\${var.app_name}-lambda-errors"
@@ -306,10 +300,10 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   period              = 60
   statistic           = "Sum"
   threshold           = 5
-  alarm_description   = "Alarm when Lambda encounters more than 5 errors in 1 minute"
+  alarm_description   = "Alarm when Lambda encounters > 5 errors in 1 minute"
 
   dimensions = {
-    FunctionName = try(aws_lambda_function.api_handler.function_name, "cloudpulse-backend")
+    FunctionName = try(aws_lambda_function.api_handler.function_name, "cloudpulse-app-api")
   }
 }
 `;
@@ -317,21 +311,16 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
 
   tf += `
 # ------------------------------------------------------------------------------
-# Outputs (Live Deployment Endpoint URLs)
+# Outputs
 # ------------------------------------------------------------------------------
-output "cloudfront_domain" {
-  description = "CloudFront live CDN HTTPS URL"
+output "cloudfront_url" {
+  description = "CloudFront CDN Live URL"
   value       = try("https://\${aws_cloudfront_distribution.cdn.domain_name}", "N/A")
 }
 
-output "api_gateway_endpoint" {
-  description = "Serverless API Gateway HTTP endpoint"
+output "api_gateway_url" {
+  description = "Serverless API Gateway Endpoint"
   value       = try(aws_apigatewayv2_stage.prod.invoke_url, "N/A")
-}
-
-output "s3_bucket_name" {
-  description = "S3 Deployment Bucket"
-  value       = try(aws_s3_bucket.frontend.id, "N/A")
 }
 `;
 
@@ -339,11 +328,7 @@ output "s3_bucket_name" {
 }
 
 export function generateCDK(_nodes: ArchitectureNode[], _connections: ArchitectureConnection[]): string {
-  return `// ==============================================================================
-// CloudPulse AI - AWS CDK Stack Definition (TypeScript)
-// ==============================================================================
-
-import * as cdk from 'aws-cdk-lib';
+  return `import * as cdk from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
@@ -351,13 +336,14 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigw from 'aws-cdk-lib/aws-apigatewayv2';
 import * as integrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 import { Construct } from 'constructs';
 
 export class CloudPulseStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // 1. S3 Bucket for Static Web App
+    // 1. S3 Static Website Bucket
     const siteBucket = new s3.Bucket(this, 'CloudPulseSiteBucket', {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.S3_MANAGED,
@@ -365,7 +351,7 @@ export class CloudPulseStack extends cdk.Stack {
       autoDeleteObjects: true,
     });
 
-    // 2. DynamoDB Serverless Table
+    // 2. DynamoDB Serverless On-Demand Table
     const dataTable = new dynamodb.Table(this, 'CloudPulseTable', {
       partitionKey: { name: 'PK', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'SK', type: dynamodb.AttributeType.STRING },
@@ -374,12 +360,12 @@ export class CloudPulseStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // 3. AWS Lambda on Graviton ARM64
+    // 3. AWS Lambda on Graviton3 ARM64
     const apiFunction = new lambda.Function(this, 'CloudPulseApiHandler', {
       runtime: lambda.Runtime.NODEJS_20_X,
       architecture: lambda.Architecture.ARM_64,
       handler: 'index.handler',
-      code: lambda.Code.fromAsset('../backend/dist'),
+      code: lambda.Code.fromAsset('../../backend/dist'),
       environment: {
         TABLE_NAME: dataTable.tableName,
       },
@@ -409,16 +395,65 @@ export class CloudPulseStack extends cdk.Stack {
           origin: new origins.HttpOrigin(\`\${httpApi.httpApiId}.execute-api.\${this.region}.amazonaws.com\`),
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
           cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
-          originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
         }
       },
       defaultRootObject: 'index.html',
     });
 
+    // 6. CloudWatch Metric Alarm
+    new cloudwatch.Alarm(this, 'LambdaErrorAlarm', {
+      metric: apiFunction.metricErrors(),
+      threshold: 5,
+      evaluationPeriods: 1,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'CloudFrontURL', { value: \`https://\${distribution.distributionDomainName}\` });
     new cdk.CfnOutput(this, 'ApiGatewayURL', { value: httpApi.url ?? '' });
+    new cdk.CfnOutput(this, 'S3BucketName', { value: siteBucket.bucketName });
   }
 }
+`;
+}
+
+export function generatePulumi(_nodes: ArchitectureNode[], _connections: ArchitectureConnection[]): string {
+  return `import * as pulumi from "@pulumi/pulumi";
+import * as aws from "@pulumi/aws";
+
+// 1. S3 Bucket for Static Assets
+const siteBucket = new aws.s3.Bucket("frontendBucket", {
+    acl: "private",
+    forceDestroy: true,
+});
+
+const blockPublicAccess = new aws.s3.BucketPublicAccessBlock("frontendPublicAccessBlock", {
+    bucket: siteBucket.id,
+    blockPublicAcls: true,
+    blockPublicPolicy: true,
+    ignorePublicAcls: true,
+    restrictPublicBuckets: true,
+});
+
+// 2. DynamoDB Serverless Table
+const dynamoTable = new aws.dynamodb.Table("dataTable", {
+    billingMode: "PAY_PER_REQUEST",
+    attributes: [
+        { name: "PK", type: "S" },
+        { name: "SK", type: "S" }
+    ],
+    hashKey: "PK",
+    rangeKey: "SK",
+    pointInTimeRecovery: { enabled: true },
+});
+
+// 3. CloudFront Distribution with OAC
+const oac = new aws.cloudfront.OriginAccessControl("siteOAC", {
+    originAccessControlOriginType: "s3",
+    signingBehavior: "always",
+    signingProtocol: "sigv4",
+});
+
+export const bucketName = siteBucket.id;
+export const tableName = dynamoTable.id;
 `;
 }

@@ -30,89 +30,89 @@ export const SecurityAuditor: React.FC = () => {
     setIsScanning(true);
     setTimeout(() => {
       setIsScanning(false);
-    }, 1200);
+    }, 1000);
   };
 
   return (
     <div className="space-y-6">
-      {/* Scorecard Bento Header */}
-      <div className="bento-card p-6 relative overflow-hidden">
+      {/* Scorecard Header */}
+      <div className="cloud-card p-6">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           <div className="md:col-span-8 space-y-2">
             <div className="flex items-center space-x-2">
-              <span className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="p-1.5 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                 <ShieldCheck className="w-5 h-5" />
               </span>
-              <h2 className="text-lg font-bold text-slate-100">AWS Well-Architected Framework Audit</h2>
+              <h2 className="text-base font-bold text-white">AWS Well-Architected Framework Assessment</h2>
             </div>
-            <p className="text-xs text-slate-300/80 leading-relaxed max-w-2xl">
+            <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
               Automated compliance evaluation across all 6 AWS Well-Architected Framework pillars. Evaluates infrastructure-as-code configurations, IAM least-privilege, encryption-at-rest, and edge caching resilience.
             </p>
             <div className="flex flex-wrap gap-2 pt-2">
-              <span className="px-3 py-1 rounded-lg bg-slate-950/80 text-slate-300 border border-white/10 text-xs font-mono">
+              <span className="px-2.5 py-1 rounded bg-[#080B11] text-slate-300 border border-white/[0.06] text-xs font-mono">
                 Pillars Evaluated: <span className="text-amber-400 font-bold">6 / 6</span>
               </span>
-              <span className="px-3 py-1 rounded-lg bg-slate-950/80 text-slate-300 border border-white/10 text-xs font-mono">
+              <span className="px-2.5 py-1 rounded bg-[#080B11] text-slate-300 border border-white/[0.06] text-xs font-mono">
                 Checks Passed: <span className="text-emerald-400 font-bold">{passedCount} / {items.length}</span>
               </span>
-              <span className="px-3 py-1 rounded-lg bg-slate-950/80 text-slate-300 border border-white/10 text-xs font-mono">
+              <span className="px-2.5 py-1 rounded bg-[#080B11] text-slate-300 border border-white/[0.06] text-xs font-mono">
                 Critical Vulnerabilities: <span className="text-emerald-400 font-bold">0</span>
               </span>
             </div>
           </div>
 
-          <div className="md:col-span-4 flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-950/80 border border-white/10">
+          <div className="md:col-span-4 flex flex-col items-center justify-center p-4 rounded-xl bg-[#080B11] border border-white/[0.06]">
             <div className="relative flex items-center justify-center">
-              <svg className="w-28 h-28 transform -rotate-90">
+              <svg className="w-24 h-24 transform -rotate-90">
                 <circle
-                  cx="56"
-                  cy="56"
-                  r="46"
+                  cx="48"
+                  cy="48"
+                  r="38"
                   className="text-slate-800"
-                  strokeWidth="8"
+                  strokeWidth="7"
                   stroke="currentColor"
                   fill="transparent"
                 />
                 <circle
-                  cx="56"
-                  cy="56"
-                  r="46"
+                  cx="48"
+                  cy="48"
+                  r="38"
                   className="text-emerald-400 transition-all duration-1000 ease-out"
-                  strokeWidth="8"
-                  strokeDasharray={289}
-                  strokeDashoffset={289 - (289 * score) / 100}
+                  strokeWidth="7"
+                  strokeDasharray={238}
+                  strokeDashoffset={238 - (238 * score) / 100}
                   strokeLinecap="round"
                   stroke="currentColor"
                   fill="transparent"
                 />
               </svg>
               <div className="absolute flex flex-col items-center justify-center">
-                <span className="text-2xl font-black text-slate-100 font-mono">{score}%</span>
-                <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Passed</span>
+                <span className="text-2xl font-bold text-white font-mono">{score}%</span>
+                <span className="text-[9px] text-emerald-400 font-bold uppercase tracking-wider">Passed</span>
               </div>
             </div>
             <button
               onClick={handleRescan}
               disabled={isScanning}
-              className="mt-3 flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors border border-white/10"
+              className="mt-3 flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#141B2D] hover:bg-[#1E293B] text-slate-200 text-xs font-medium transition-colors border border-white/[0.06]"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin text-amber-400' : ''}`} />
-              <span>{isScanning ? 'Auditing Codebase...' : 'Re-run Compliance Scan'}</span>
+              <span>{isScanning ? 'Scanning...' : 'Re-run Compliance Scan'}</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Pillar Filters */}
-      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
         {pillars.map((pillar) => (
           <button
             key={pillar}
             onClick={() => setSelectedPillar(pillar)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
               selectedPillar === pillar
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 bg-slate-900/60 border border-white/5'
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                : 'text-slate-400 hover:text-slate-200 bg-[#0E131F] border border-white/[0.06]'
             }`}
           >
             {pillar}
@@ -120,27 +120,27 @@ export const SecurityAuditor: React.FC = () => {
         ))}
       </div>
 
-      {/* Audit Checklist Items */}
-      <div className="space-y-3">
+      {/* Audit Items */}
+      <div className="space-y-2.5">
         {filteredItems.map((item) => {
           const isExpanded = expandedId === item.id;
           return (
             <div
               key={item.id}
-              className="bento-card overflow-hidden"
+              className="cloud-card overflow-hidden"
             >
               <div
                 onClick={() => setExpandedId(isExpanded ? null : item.id)}
-                className="p-4 flex items-center justify-between cursor-pointer select-none"
+                className="p-3.5 flex items-center justify-between cursor-pointer select-none"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                    <CheckCircle className="w-4 h-4" />
+                  <div className="w-6 h-6 rounded-md bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <CheckCircle className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-xs font-bold text-slate-200">{item.title}</span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-white/10">
+                      <span className="text-xs font-semibold text-slate-200">{item.title}</span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#080B11] text-slate-400 border border-white/[0.06]">
                         {item.pillar}
                       </span>
                     </div>
@@ -149,7 +149,7 @@ export const SecurityAuditor: React.FC = () => {
                 </div>
 
                 <div className="flex items-center space-x-3">
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                     Passed
                   </span>
                   {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
@@ -157,26 +157,26 @@ export const SecurityAuditor: React.FC = () => {
               </div>
 
               {isExpanded && (
-                <div className="px-4 pb-4 pt-1 border-t border-white/10 space-y-3 text-xs bg-slate-950/40">
-                  <div className="p-3 rounded-xl bg-slate-900/80 border border-white/10 space-y-1">
-                    <span className="font-bold text-slate-300">Detailed Recommendation:</span>
+                <div className="px-4 pb-4 pt-1 border-t border-white/[0.06] space-y-3 text-xs bg-[#080B11]">
+                  <div className="p-3 rounded-lg bg-[#0E131F] border border-white/[0.06] space-y-1 mt-2">
+                    <span className="font-bold text-slate-300">Technical Context:</span>
                     <p className="text-slate-400 leading-relaxed">{item.description}</p>
-                    <p className="text-emerald-400/90 font-mono text-[11px] mt-1">✓ Remediation: {item.remediation}</p>
+                    <p className="text-emerald-400/90 font-mono text-[11px] mt-1">✓ Implementation: {item.remediation}</p>
                   </div>
 
                   {item.terraformSnippet && (
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-[11px] font-mono text-slate-400">Enforced Terraform Block:</span>
+                        <span className="text-[11px] font-mono text-slate-400">IaC Terraform Definition:</span>
                         <button
                           onClick={() => handleCopySnippet(item.id, item.terraformSnippet)}
-                          className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-mono border border-white/10"
+                          className="flex items-center space-x-1 px-2 py-0.5 rounded bg-[#141B2D] hover:bg-[#1E293B] text-slate-200 text-[10px] font-mono border border-white/[0.06]"
                         >
                           {copiedId === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                           <span>{copiedId === item.id ? 'Copied' : 'Copy'}</span>
                         </button>
                       </div>
-                      <pre className="p-3 rounded-xl bg-slate-950 border border-white/10 font-mono text-[11px] text-amber-200/80 overflow-x-auto">
+                      <pre className="p-3 rounded-lg bg-[#07090E] border border-white/[0.06] font-mono text-[11px] text-amber-200/90 overflow-x-auto">
                         {item.terraformSnippet}
                       </pre>
                     </div>

@@ -95,31 +95,31 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="bento-card p-6">
+      <div className="cloud-card p-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              <span className="p-1.5 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30">
                 <Globe className="w-5 h-5" />
               </span>
-              <h2 className="text-lg font-bold text-slate-100">Live AWS Deployment Architecture Inspector</h2>
+              <h2 className="text-base font-bold text-white">Live AWS Production Architecture Inspector</h2>
             </div>
-            <p className="text-xs text-slate-300/80 mt-1">
+            <p className="text-xs text-slate-300 mt-1">
               Explore the exact multi-tier AWS cloud infrastructure configured and provisioned for this application.
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <span className="px-3.5 py-1.5 rounded-xl bg-slate-950/80 border border-white/10 text-xs font-mono text-emerald-400 flex items-center gap-2">
+            <span className="px-3 py-1.5 rounded-lg bg-[#080B11] border border-white/[0.08] text-xs font-mono text-emerald-400 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Status: Production Live on AWS
+              Status: Live on AWS
             </span>
           </div>
         </div>
       </div>
 
-      {/* Bento Interactive Layer View */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-5 space-y-3">
+      {/* Interactive Layer View */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div className="lg:col-span-5 space-y-2.5">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">
             Infrastructure Stack Tiers
           </h3>
@@ -130,51 +130,49 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
               <div
                 key={layer.id}
                 onClick={() => setActiveLayer(layer.id)}
-                className={`bento-card p-4 cursor-pointer flex items-center justify-between ${
-                  isSelected
-                    ? 'ring-2 ring-amber-500/50 !border-amber-500/60 shadow-lg shadow-amber-500/10'
-                    : 'hover:border-white/20'
+                className={`cloud-card p-3.5 cursor-pointer flex items-center justify-between ${
+                  isSelected ? 'cloud-card-selected' : ''
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                    isSelected ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400'
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                    isSelected ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-[#080B11] text-slate-400'
                   }`}>
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-200">{layer.name}</h4>
+                    <h4 className="text-xs font-semibold text-slate-200">{layer.name}</h4>
                     <p className="text-[11px] text-amber-400 font-mono">{layer.service}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-slate-950 text-slate-400 border border-white/10">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#080B11] text-slate-400 border border-white/[0.06]">
                     {layer.status}
                   </span>
-                  <ArrowRight className={`w-4 h-4 ${isSelected ? 'text-amber-400' : 'text-slate-600'}`} />
+                  <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-400' : 'text-slate-600'}`} />
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Layer Details Bento Panel */}
-        <div className="lg:col-span-7 bento-card p-6 flex flex-col justify-between">
+        {/* Details Panel */}
+        <div className="lg:col-span-7 cloud-card p-6 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.06] mb-4">
               <div>
-                <span className="text-xs font-mono text-amber-400 uppercase tracking-wider">{selectedLayerData.service}</span>
-                <h3 className="text-base font-bold text-slate-100">{selectedLayerData.name}</h3>
+                <span className="text-[11px] font-mono text-amber-400 uppercase tracking-wider">{selectedLayerData.service}</span>
+                <h3 className="text-sm font-bold text-white">{selectedLayerData.name}</h3>
               </div>
-              <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-mono font-semibold">
+              <span className="px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-xs font-mono font-medium">
                 {selectedLayerData.status}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {selectedLayerData.details.map((detail, idx) => (
-                <div key={idx} className="p-4 rounded-xl bg-slate-950/80 border border-white/10 space-y-1">
+                <div key={idx} className="p-3 rounded-lg bg-[#080B11] border border-white/[0.06] space-y-1">
                   <span className="text-[11px] text-slate-400 font-mono">{detail.label}</span>
                   <p className="text-xs font-bold text-slate-200 break-all">{detail.value}</p>
                 </div>
@@ -182,13 +180,13 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
             </div>
           </div>
 
-          <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-emerald-500/10 border border-amber-500/25 text-xs text-slate-300">
+          <div className="mt-5 p-3.5 rounded-lg bg-[#0E131F] border border-amber-500/20 text-xs text-slate-300">
             <div className="flex items-center space-x-2 font-bold text-amber-300 mb-1">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>100% AWS Well-Architected & Free-Tier Compliant</span>
+              <span>Production Live in ap-southeast-2 (Sydney)</span>
             </div>
             <p className="text-slate-400 text-[11px] leading-relaxed">
-              Live AWS production deployment verified in Sydney (`ap-southeast-2`) using CloudFormation, S3 OAC, and CloudFront.
+              Configured using CloudFormation and S3 Origin Access Control with zero server maintenance overhead.
             </p>
           </div>
         </div>

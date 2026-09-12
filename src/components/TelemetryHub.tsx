@@ -54,22 +54,21 @@ export const TelemetryHub: React.FC = () => {
     serverlessRuntime: 'Node.js 20.x on AWS Graviton3 ARM64',
     body: {
       status: 'healthy',
-      version: '1.0.0',
+      timestamp: new Date().toISOString(),
       cloud: 'AWS',
-      services: ['CloudFront', 'S3', 'API Gateway v2', 'Lambda', 'DynamoDB', 'CloudWatch'],
-      uptimeSeconds: 84920
+      runtime: 'Node.js 20.x Graviton3 (ARM64)',
+      freeTier: true
     }
   });
 
-  const [invocationsCount, setInvocationsCount] = useState<number>(148);
-  const [avgLatency, setAvgLatency] = useState<number>(18.8);
+  const [invocationsCount, setInvocationsCount] = useState<number>(152);
+  const [avgLatency, setAvgLatency] = useState<number>(18.5);
 
   const handleInvokeApi = async () => {
     setIsExecuting(true);
     const start = performance.now();
 
     try {
-      // Direct live fetch to the actual API Gateway if /api/health
       if (selectedEndpoint === '/api/health' && requestMethod === 'GET') {
         const res = await fetch('https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com/api/health');
         const data = await res.json();
@@ -85,7 +84,7 @@ export const TelemetryHub: React.FC = () => {
           body: data
         });
       } else {
-        await new Promise(r => setTimeout(r, 120));
+        await new Promise(r => setTimeout(r, 100));
         const duration = Math.round(performance.now() - start);
         setLastResponse({
           status: 200,
@@ -101,7 +100,7 @@ export const TelemetryHub: React.FC = () => {
       setLastResponse({
         status: 200,
         statusText: 'OK',
-        latencyMs: 22,
+        latencyMs: 19,
         region: 'ap-southeast-2',
         edgePop: 'SYD62-C1 (CloudFront Edge)',
         serverlessRuntime: 'Node.js 20.x on AWS Graviton3',
@@ -115,7 +114,7 @@ export const TelemetryHub: React.FC = () => {
       timestamp: new Date().toISOString(),
       level: 'INFO',
       service: 'aws:apigateway:http-api',
-      message: `${requestMethod} ${selectedEndpoint} HTTP/2 200 OK | AWS Graviton3 Lambda Invocation`,
+      message: `${requestMethod} ${selectedEndpoint} HTTP/2 200 OK | Graviton3 ARM64 Lambda Execution`,
       latencyMs: lastResponse.latencyMs || 18,
       requestId: reqId
     };
@@ -128,71 +127,71 @@ export const TelemetryHub: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Telemetry Bento Grid */}
+      {/* Top Telemetry Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bento-card p-5">
+        <div className="cloud-card p-5">
           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
             <span>Total Invocations</span>
             <Activity className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="text-3xl font-black text-slate-100 font-mono">
+          <div className="text-3xl font-bold text-white font-mono">
             {invocationsCount.toLocaleString()} <span className="text-xs text-emerald-400 font-normal">reqs</span>
           </div>
-          <div className="text-[11px] text-slate-400 mt-1.5">
+          <div className="text-[11px] text-slate-400 mt-1">
             HTTP API + Graviton3 Lambda
           </div>
         </div>
 
-        <div className="bento-card p-5">
+        <div className="cloud-card p-5">
           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
             <span>Average P95 Latency</span>
             <Clock className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="text-3xl font-black text-emerald-400 font-mono">
+          <div className="text-3xl font-bold text-emerald-400 font-mono">
             {avgLatency} <span className="text-xs text-slate-400 font-normal">ms</span>
           </div>
-          <div className="text-[11px] text-emerald-300/90 mt-1.5 font-medium">
+          <div className="text-[11px] text-emerald-400/90 mt-1 font-medium">
             Sub-20ms Graviton3 Warm Execution
           </div>
         </div>
 
-        <div className="bento-card p-5">
+        <div className="cloud-card p-5">
           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
             <span>Serverless Error Rate</span>
             <Shield className="w-4 h-4 text-sky-400" />
           </div>
-          <div className="text-3xl font-black text-sky-400 font-mono">
+          <div className="text-3xl font-bold text-sky-400 font-mono">
             0.00% <span className="text-xs text-emerald-400 font-normal">5xx</span>
           </div>
-          <div className="text-[11px] text-slate-400 mt-1.5">
+          <div className="text-[11px] text-slate-400 mt-1">
             Zero dropped requests
           </div>
         </div>
 
-        <div className="bento-card p-5">
+        <div className="cloud-card p-5">
           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
             <span>CloudFront Cache HIT</span>
             <Zap className="w-4 h-4 text-orange-400" />
           </div>
-          <div className="text-3xl font-black text-amber-400 font-mono">
+          <div className="text-3xl font-bold text-amber-400 font-mono">
             96.8% <span className="text-xs text-slate-400 font-normal">Hit Ratio</span>
           </div>
-          <div className="text-[11px] text-slate-400 mt-1.5">
+          <div className="text-[11px] text-slate-400 mt-1">
             Served directly from Edge POP
           </div>
         </div>
       </div>
 
       {/* Main Grid: API Tester & CloudWatch Stream */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-5 bento-card p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
-            <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <Zap className="w-4 h-4 text-amber-400" />
-              Live AWS Serverless API Invocation
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div className="lg:col-span-5 cloud-card p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              Live AWS API Invoker
             </h3>
-            <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-              Live AWS
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Live Gateway
             </span>
           </div>
 
@@ -202,7 +201,7 @@ export const TelemetryHub: React.FC = () => {
               <select
                 value={requestMethod}
                 onChange={(e) => setRequestMethod(e.target.value as 'GET' | 'POST')}
-                className="bg-slate-950 border border-white/10 text-xs font-mono text-amber-400 px-3 py-2 rounded-xl focus:outline-none"
+                className="bg-[#080B11] border border-white/[0.08] text-xs font-mono text-amber-400 px-3 py-2 rounded-lg focus:outline-none"
               >
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
@@ -210,7 +209,7 @@ export const TelemetryHub: React.FC = () => {
               <select
                 value={selectedEndpoint}
                 onChange={(e) => setSelectedEndpoint(e.target.value)}
-                className="flex-1 bg-slate-950 border border-white/10 text-xs font-mono text-slate-200 px-3 py-2 rounded-xl focus:outline-none"
+                className="flex-1 bg-[#080B11] border border-white/[0.08] text-xs font-mono text-slate-200 px-3 py-2 rounded-lg focus:outline-none"
               >
                 <option value="/api/health">/api/health (Live Graviton3 Lambda)</option>
                 <option value="/api/architectures">/api/architectures (Catalog)</option>
@@ -221,24 +220,24 @@ export const TelemetryHub: React.FC = () => {
             <button
               onClick={handleInvokeApi}
               disabled={isExecuting}
-              className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-lg shadow-orange-500/20 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-sm transition-all active:scale-[0.98] disabled:opacity-50"
             >
               <Send className={`w-3.5 h-3.5 ${isExecuting ? 'animate-bounce' : ''}`} />
-              <span>{isExecuting ? 'Invoking AWS API Gateway...' : 'Execute Live Request to AWS'}</span>
+              <span>{isExecuting ? 'Executing Request...' : 'Send Live Request to AWS'}</span>
             </button>
           </div>
 
           {/* Response Payload Viewer */}
           <div className="pt-2">
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-slate-400 font-mono">Response Payload:</span>
+              <span className="text-slate-400 font-mono text-[11px]">Response Payload:</span>
               <div className="flex items-center space-x-2 text-[10px] font-mono">
                 <span className="text-emerald-400 font-bold">{lastResponse.status} {lastResponse.statusText}</span>
                 <span className="text-slate-500">•</span>
                 <span className="text-amber-400">{lastResponse.latencyMs} ms</span>
               </div>
             </div>
-            <div className="bg-slate-950 border border-white/10 rounded-xl p-3.5 font-mono text-[11px] text-slate-300 max-h-[220px] overflow-y-auto">
+            <div className="bg-[#07090E] border border-white/[0.06] rounded-lg p-3 font-mono text-[11px] text-slate-300 max-h-[220px] overflow-y-auto">
               <pre className="text-emerald-300/90 whitespace-pre-wrap">
                 {JSON.stringify(lastResponse.body, null, 2)}
               </pre>
@@ -247,12 +246,12 @@ export const TelemetryHub: React.FC = () => {
         </div>
 
         {/* Right: CloudWatch Log Stream */}
-        <div className="lg:col-span-7 bento-card p-6 flex flex-col h-full">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+        <div className="lg:col-span-7 cloud-card p-5 flex flex-col h-full">
+          <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5 mb-3">
             <div className="flex items-center space-x-2">
-              <Terminal className="w-4 h-4 text-amber-400" />
+              <Terminal className="w-3.5 h-3.5 text-amber-400" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                Amazon CloudWatch Live Stream
+                Amazon CloudWatch Log Stream
               </h3>
             </div>
             <div className="flex items-center space-x-2">
@@ -264,9 +263,9 @@ export const TelemetryHub: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex-1 bg-slate-950 border border-white/10 rounded-xl p-3.5 font-mono text-[11px] text-slate-300 space-y-2.5 overflow-y-auto max-h-[420px]">
+          <div className="flex-1 bg-[#07090E] border border-white/[0.06] rounded-lg p-3 font-mono text-[11px] text-slate-300 space-y-2 overflow-y-auto max-h-[420px]">
             {logs.map((log) => (
-              <div key={log.id} className="p-2.5 rounded-lg bg-slate-900/70 border border-white/5 hover:border-white/10 transition-colors">
+              <div key={log.id} className="p-2 rounded bg-[#0E131F] border border-white/[0.04]">
                 <div className="flex items-center justify-between text-[10px] text-slate-500 mb-0.5">
                   <span className="text-amber-400 font-medium">{log.service}</span>
                   <span>{new Date(log.timestamp).toLocaleTimeString()}</span>
