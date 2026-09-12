@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe, Server, Database, Zap, CheckCircle2, ArrowRight, Layers } from 'lucide-react';
+import { Globe, Server, Database, Zap, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
 
 interface DeploymentInspectorProps {
   selectedRegion: string;
@@ -93,33 +93,31 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
   const selectedLayerData = architectureLayers.find(l => l.id === activeLayer) || architectureLayers[0];
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="cloud-card p-5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="p-1.5 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                <Globe className="w-5 h-5" />
-              </span>
-              <h2 className="text-base font-bold text-white">Live AWS Production Architecture Inspector</h2>
-            </div>
-            <p className="text-xs text-slate-300 mt-1">
-              Explore the exact multi-tier AWS cloud infrastructure configured and provisioned for this application.
-            </p>
+    <div className="space-y-8">
+      {/* Header & Overview */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/[0.06]">
+        <div>
+          <div className="flex items-center space-x-2 text-[#FF9900] text-xs font-mono font-semibold uppercase tracking-wider mb-1">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Multi-Tier Infrastructure Topology</span>
           </div>
-          <div className="flex items-center space-x-3">
-            <span className="px-3 py-1.5 rounded-lg bg-[#080B11] border border-white/[0.08] text-xs font-mono text-emerald-400 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Status: Live on AWS
-            </span>
-          </div>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">AWS Deployment Inspector</h1>
+          <p className="text-sm text-slate-300 mt-1 max-w-2xl">
+            Inspect the live AWS infrastructure stack deployed via CloudFormation and S3 OAC into Sydney (ap-southeast-2).
+          </p>
+        </div>
+        <div className="flex items-center space-x-3 text-xs font-mono">
+          <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            CloudFormation Stack: cloudpulse-app
+          </span>
         </div>
       </div>
 
-      {/* Interactive Layer View */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div className="lg:col-span-5 space-y-2.5">
+      {/* Interactive Layer Explorer */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left: Stack Tier Selector List */}
+        <div className="lg:col-span-5 space-y-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">
             Infrastructure Stack Tiers
           </h3>
@@ -130,64 +128,68 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
               <div
                 key={layer.id}
                 onClick={() => setActiveLayer(layer.id)}
-                className={`cloud-card p-3.5 cursor-pointer flex items-center justify-between ${
-                  isSelected ? 'cloud-card-selected' : ''
+                className={`aws-card p-4 cursor-pointer flex items-center justify-between transition-all duration-200 ${
+                  isSelected ? 'aws-card-active' : ''
                 }`}
               >
-                <div className="flex items-center space-x-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    isSelected ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-[#080B11] text-slate-400'
+                <div className="flex items-center space-x-3.5">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    isSelected ? 'bg-[#FF9900]/20 text-[#FF9900] border border-[#FF9900]/40' : 'bg-[#0B111B] text-slate-400'
                   }`}>
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-5 h-5 stroke-[2.2]" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-slate-200">{layer.name}</h4>
-                    <p className="text-[11px] text-amber-400 font-mono">{layer.service}</p>
+                    <h4 className="text-xs font-bold text-white">{layer.name}</h4>
+                    <p className="text-xs text-[#539FE5] font-mono font-medium">{layer.service}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#080B11] text-slate-400 border border-white/[0.06]">
+                  <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-[#0B111B] text-slate-300 border border-white/[0.08]">
                     {layer.status}
                   </span>
-                  <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-400' : 'text-slate-600'}`} />
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Details Panel */}
-        <div className="lg:col-span-7 cloud-card p-6 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.06] mb-4">
-              <div>
-                <span className="text-[11px] font-mono text-amber-400 uppercase tracking-wider">{selectedLayerData.service}</span>
-                <h3 className="text-sm font-bold text-white">{selectedLayerData.name}</h3>
+        {/* Right: Detailed Specification Viewer */}
+        <div className="lg:col-span-7 aws-card p-8 space-y-6">
+          <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-[#FF9900]/15 text-[#FF9900] border border-[#FF9900]/30 flex items-center justify-center">
+                <selectedLayerData.icon className="w-5 h-5 stroke-[2.2]" />
               </div>
-              <span className="px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-xs font-mono font-medium">
-                {selectedLayerData.status}
-              </span>
+              <div>
+                <h3 className="text-lg font-bold text-white">{selectedLayerData.name}</h3>
+                <span className="text-xs text-[#539FE5] font-mono font-semibold">{selectedLayerData.service}</span>
+              </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {selectedLayerData.details.map((detail, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-[#080B11] border border-white/[0.06] space-y-1">
-                  <span className="text-[11px] text-slate-400 font-mono">{detail.label}</span>
-                  <p className="text-xs font-bold text-slate-200 break-all">{detail.value}</p>
-                </div>
-              ))}
-            </div>
+            <span className="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Verified Active
+            </span>
           </div>
 
-          <div className="mt-5 p-3.5 rounded-lg bg-[#0E131F] border border-amber-500/20 text-xs text-slate-300">
-            <div className="flex items-center space-x-2 font-bold text-amber-300 mb-1">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>Production Live in ap-southeast-2 (Sydney)</span>
-            </div>
-            <p className="text-slate-400 text-[11px] leading-relaxed">
-              Configured using CloudFormation and S3 Origin Access Control with zero server maintenance overhead.
-            </p>
+          {/* Key-Value Specifications */}
+          <div className="space-y-3.5">
+            {selectedLayerData.details.map((detail, idx) => (
+              <div
+                key={idx}
+                className="p-4 rounded-xl bg-[#0B111B] border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+              >
+                <span className="text-xs text-slate-400 font-mono">{detail.label}</span>
+                <span className="text-xs font-mono font-bold text-slate-100 break-all text-left sm:text-right">
+                  {detail.value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#0B111B] border border-white/[0.06] flex items-center justify-between text-xs font-mono text-slate-400">
+            <span>Security Model: AWS IAM Least Privilege</span>
+            <span className="text-[#FF9900] font-semibold">AWS CDK & TF Tested</span>
           </div>
         </div>
       </div>

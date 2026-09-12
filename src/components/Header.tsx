@@ -17,10 +17,10 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const triggerCelebration = () => {
     confetti({
-      particleCount: 100,
-      spread: 70,
+      particleCount: 120,
+      spread: 80,
       origin: { y: 0.6 },
-      colors: ['#FF9900', '#10B981', '#38BDF8', '#6366F1']
+      colors: ['#FF9900', '#539FE5', '#10B981', '#FFFFFF']
     });
   };
 
@@ -34,74 +34,84 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   const regions = [
-    { id: 'ap-southeast-2', name: 'AP (Sydney)' },
-    { id: 'us-east-1', name: 'US East (N. Virginia)' },
-    { id: 'eu-west-1', name: 'EU (Ireland)' },
-    { id: 'ap-south-1', name: 'AP (Mumbai)' },
+    { id: 'ap-southeast-2', name: 'AP (Sydney) • ap-southeast-2' },
+    { id: 'us-east-1', name: 'US East (N. Virginia) • us-east-1' },
+    { id: 'eu-west-1', name: 'EU (Ireland) • eu-west-1' },
+    { id: 'ap-south-1', name: 'AP (Mumbai) • ap-south-1' },
   ];
 
   return (
-    <header className="border-b border-white/[0.08] bg-[#0A0D14]/90 backdrop-blur-xl sticky top-0 z-50">
-      {/* Top Production Banner */}
-      <div className="bg-[#0E131F] border-b border-white/[0.06] px-4 py-1.5 text-xs text-slate-300 flex items-center justify-between">
-        <div className="flex items-center space-x-2.5 mx-auto sm:mx-0">
-          <span className="flex h-2 w-2 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span className="font-semibold text-white tracking-wide">AWS Production Active:</span>
-          <span className="text-slate-300">CloudFront Global Edge • Graviton3 ARM64 • DynamoDB On-Demand</span>
-          <span className="hidden lg:inline text-amber-400 font-mono text-[11px]">• $0.00/mo Free Tier Verified</span>
-        </div>
-        <div className="hidden sm:flex items-center space-x-3">
-          <a
-            href="https://github.com/RamSuryaCH/cloudpulse-aws"
-            target="_blank"
-            rel="noreferrer"
-            className="text-[11px] text-slate-400 hover:text-amber-400 transition-colors font-mono"
-          >
-            GitHub: RamSuryaCH/cloudpulse-aws ↗
-          </a>
-          <button 
-            onClick={triggerCelebration}
-            className="flex items-center space-x-1.5 text-xs bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 px-2.5 py-0.5 rounded-md transition-all active:scale-95 font-medium"
-          >
-            <Sparkles className="w-3 h-3" />
-            <span>Celebrate 🎉</span>
-          </button>
+    <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#0B111B]/85 backdrop-blur-2xl transition-all">
+      {/* Top Status Bar with Live Indicator */}
+      <div className="border-b border-white/[0.05] bg-[#0F1B2A]/70 px-4 sm:px-8 py-2 text-xs text-slate-300">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center space-x-3 text-xs">
+            <span className="flex h-2.5 w-2.5 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 ring-2 ring-emerald-500/30"></span>
+            </span>
+            <span className="font-semibold text-white tracking-wide">AWS Production Stack Live:</span>
+            <span className="text-slate-300 hidden md:inline">CloudFront Global Edge • Graviton3 Lambda • DynamoDB</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              100% Free Tier ($0.00/mo)
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-4 text-xs font-mono">
+            <a
+              href="https://github.com/RamSuryaCH/cloudpulse-aws"
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-400 hover:text-[#FF9900] transition-colors flex items-center gap-1.5"
+            >
+              <span>github.com/RamSuryaCH/cloudpulse-aws</span>
+              <span className="text-slate-500">↗</span>
+            </a>
+            <button 
+              onClick={triggerCelebration}
+              className="flex items-center space-x-1.5 bg-[#FF9900]/15 hover:bg-[#FF9900]/25 border border-[#FF9900]/40 text-[#FF9900] px-3 py-1 rounded-lg transition-all active:scale-95 font-medium"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Celebrate Deployment</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-15">
-          {/* Brand */}
-          <div className="flex items-center space-x-3 cursor-pointer select-none" onClick={() => setActiveTab('studio')}>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-slate-950 font-bold shadow-md shadow-amber-500/20 ring-1 ring-white/10">
-              <Cloud className="w-5 h-5 text-slate-950" />
+      {/* Main Apple-Grade Pro Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+        <div className="flex items-center justify-between gap-4">
+          {/* Brand & Identity */}
+          <div 
+            className="flex items-center space-x-3.5 cursor-pointer select-none group" 
+            onClick={() => setActiveTab('studio')}
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF9900] via-[#EC7211] to-[#D05C06] flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-[#FF9900]/20 ring-1 ring-white/20 group-hover:scale-105 transition-transform duration-200">
+              <Cloud className="w-6 h-6 text-slate-950 stroke-[2.2]" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-base font-bold text-white tracking-tight">CloudPulse <span className="text-amber-400 font-mono font-semibold text-xs px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/20">AI</span></span>
-                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-semibold">
-                  LIVE AWS
+                <span className="text-lg font-bold text-white tracking-tight">CloudPulse <span className="text-[#FF9900] font-mono font-semibold text-xs px-2 py-0.5 rounded-md bg-[#FF9900]/15 border border-[#FF9900]/30 ml-0.5">AI</span></span>
+                <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold tracking-wider">
+                  PRODUCTION
                 </span>
               </div>
+              <p className="text-[11px] text-slate-400 hidden sm:block">AWS Architecture Studio & Serverless Observability Hub</p>
             </div>
           </div>
 
-          {/* Region and Actions */}
+          {/* Region Selector & Entry CTA */}
           <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-1.5 bg-[#0E131F] border border-white/[0.08] px-2.5 py-1.5 rounded-lg text-xs">
-              <Server className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-slate-400 text-[11px] hidden sm:inline">Region:</span>
+            <div className="flex items-center space-x-2 bg-[#0F1B2A] border border-white/[0.08] px-3 py-2 rounded-xl text-xs shadow-inner">
+              <Server className="w-4 h-4 text-[#FF9900]" />
               <select
                 value={selectedRegion}
                 onChange={(e) => setSelectedRegion(e.target.value)}
-                className="bg-transparent text-slate-200 font-mono text-xs focus:outline-none cursor-pointer"
+                aria-label="Select AWS Region"
+                className="bg-transparent text-slate-200 font-medium text-xs focus:outline-none cursor-pointer pr-1"
               >
                 {regions.map((r) => (
-                  <option key={r.id} value={r.id} className="bg-slate-900 text-slate-200">
+                  <option key={r.id} value={r.id} className="bg-[#0F1B2A] text-slate-100 py-1">
                     {r.name}
                   </option>
                 ))}
@@ -110,16 +120,16 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => setActiveTab('submission')}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs shadow-sm transition-all active:scale-95"
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF9900] to-[#EC7211] hover:from-[#FFA726] hover:to-[#FF9900] text-slate-950 font-bold text-xs shadow-md shadow-[#FF9900]/25 transition-all active:scale-95 duration-150"
             >
-              <Award className="w-3.5 h-3.5" />
+              <Award className="w-4 h-4 text-slate-950 stroke-[2.5]" />
               <span>Challenge Entry</span>
             </button>
           </div>
         </div>
 
-        {/* Tab Navigation Menu */}
-        <div className="flex space-x-1 overflow-x-auto py-2 border-t border-white/[0.06] no-scrollbar">
+        {/* Apple-style Segmented Navigation Bar */}
+        <div className="mt-3 apple-segmented-pill flex space-x-1.5 overflow-x-auto no-scrollbar">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -127,13 +137,13 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all duration-150 ${
+                className={`flex items-center space-x-2.5 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
                   isActive
-                    ? 'bg-white/[0.08] text-amber-400 border border-amber-500/30 font-semibold'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] border border-transparent'
+                    ? 'bg-gradient-to-r from-[#141F30] to-[#1A283E] text-[#FF9900] shadow-md border border-[#FF9900]/40'
+                    : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-[#FF9900]' : 'text-slate-400'}`} />
                 <span>{item.label}</span>
               </button>
             );
