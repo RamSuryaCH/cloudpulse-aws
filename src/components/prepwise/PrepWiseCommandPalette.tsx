@@ -8,7 +8,8 @@ import {
   ShieldCheck, 
   ArrowRight, 
   X,
-  GraduationCap
+  GraduationCap,
+  FileText
 } from 'lucide-react';
 import { COURSE_SUBJECTS } from '../../data/prepwiseData';
 import { sounds } from '../../utils/soundEffects';
@@ -38,11 +39,12 @@ export const PrepWiseCommandPalette: React.FC<PrepWiseCommandPaletteProps> = ({
 
   const items = [
     // Navigation
-    { id: 'tab-booking', label: 'Booking Studio (Exam Sprint)', category: 'Navigation', icon: BookOpen, action: () => { onSelectTab('booking'); onClose(); } },
+    { id: 'tab-booking', label: 'Book Session (100% Free)', category: 'Navigation', icon: BookOpen, action: () => { onSelectTab('booking'); onClose(); } },
+    { id: 'tab-pyq', label: 'PYQ Vault & Solved Notes', category: 'Navigation', icon: FileText, action: () => { onSelectTab('pyq'); onClose(); } },
     { id: 'tab-tracker', label: 'Student Session Tracker', category: 'Navigation', icon: Clock, action: () => { onSelectTab('tracker'); onClose(); } },
-    { id: 'tab-tutor', label: 'Tutor Portal (75% Take-Home)', category: 'Navigation', icon: UserCheck, action: () => { onSelectTab('tutor'); onClose(); } },
-    { id: 'tab-clubs', label: 'Partner Clubs (20% Net Share)', category: 'Navigation', icon: Award, action: () => { onSelectTab('clubs'); onClose(); } },
-    { id: 'tab-admin', label: 'Admin Console & Financial Ledger', category: 'Navigation', icon: ShieldCheck, action: () => { onSelectTab('admin'); onClose(); } },
+    { id: 'tab-tutor', label: 'Peer Tutor Portal (Volunteer Karma)', category: 'Navigation', icon: UserCheck, action: () => { onSelectTab('tutor'); onClose(); } },
+    { id: 'tab-clubs', label: 'Partner Clubs & Chapters', category: 'Navigation', icon: Award, action: () => { onSelectTab('clubs'); onClose(); } },
+    { id: 'tab-admin', label: 'Campus Admin Console', category: 'Navigation', icon: ShieldCheck, action: () => { onSelectTab('admin'); onClose(); } },
 
     // Course Subjects Shortcuts
     ...COURSE_SUBJECTS.map(c => ({
@@ -93,16 +95,16 @@ export const PrepWiseCommandPalette: React.FC<PrepWiseCommandPaletteProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-20 p-4">
       <div 
-        className="apple-card max-w-xl w-full p-0 overflow-hidden shadow-2xl border-2 border-[#F59E0B]/40 animate-in fade-in zoom-in-95 duration-150"
+        className="apple-card max-w-xl w-full p-0 overflow-hidden shadow-2xl border-2 border-[#30D158]/40 animate-in fade-in zoom-in-95 duration-150"
         onKeyDown={handleKeyDown}
       >
         {/* Search Header */}
         <div className="flex items-center px-4 py-3.5 border-b border-white/[0.08] bg-[#050508]">
-          <Search className="w-5 h-5 text-[#F59E0B] mr-3 shrink-0" />
+          <Search className="w-5 h-5 text-[#30D158] mr-3 shrink-0" />
           <input
             ref={inputRef}
             type="text"
-            placeholder="Type a course name, code, or jump to view..."
+            placeholder="Type a course name, code, or PYQ paper to jump..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none font-sans"
@@ -140,14 +142,14 @@ export const PrepWiseCommandPalette: React.FC<PrepWiseCommandPaletteProps> = ({
                   }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[#F59E0B]' : 'text-slate-400'}`} />
+                    <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[#30D158]' : 'text-slate-400'}`} />
                     <span className="text-xs truncate">{item.label}</span>
                   </div>
                   <div className="flex items-center space-x-2 shrink-0">
                     <span className="text-[10px] font-mono text-slate-400 bg-white/[0.06] px-2 py-0.5 rounded-md border border-white/[0.08]">
                       {item.category}
                     </span>
-                    {isSelected && <ArrowRight className="w-3.5 h-3.5 text-[#F59E0B]" />}
+                    {isSelected && <ArrowRight className="w-3.5 h-3.5 text-[#30D158]" />}
                   </div>
                 </div>
               );

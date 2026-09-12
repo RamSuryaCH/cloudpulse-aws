@@ -60,6 +60,7 @@ export interface TutorProfile {
   rating: number;
   status: 'approved' | 'pending';
   appliedAt: string;
+  badge?: 'Gold Peer Tutor' | 'Senior TA' | 'Campus Legend';
 }
 
 export interface PartnerClub {
@@ -71,4 +72,26 @@ export interface PartnerClub {
   totalStudentsHelped: number;
   leadName: string;
   leadContact: string;
+}
+
+export interface PyqPaper {
+  id: string;
+  subjectCode: string;
+  subjectName: string;
+  year: string;
+  semester: string;
+  type: 'Mid-Exam' | 'End-Exam' | 'Lab-Viva';
+  questionsCount: number;
+  downloads: number;
+  solutionSnippet: string;
+  topics: string[];
+}
+
+export interface CampusRoom {
+  id: string;
+  name: string;
+  building: string;
+  capacity: number;
+  status: 'available' | 'occupied';
+  facilities: string[];
 }

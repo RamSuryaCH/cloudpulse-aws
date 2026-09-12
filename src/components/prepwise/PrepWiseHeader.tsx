@@ -10,7 +10,9 @@ import {
   ShieldCheck, 
   Award, 
   Clock, 
-  Building2 
+  Building2,
+  FileText,
+  TrendingUp
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sounds } from '../../utils/soundEffects';
@@ -31,6 +33,21 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
   onOpenCommandPalette,
 }) => {
   const [isMuted, setIsMuted] = useState(sounds.getMuted());
+  const [tickerIndex, setTickerIndex] = useState(0);
+
+  const tickerEvents = [
+    "🔥 Rahul V. (VNRVJIET) requested Data Structures 1-on-1 Exam Sprint",
+    "⚡ Sneha K. (CBIT) completed Math III Session with 5.0 ★ Rating",
+    "📚 AWS Cloud Club VNRVJIET hosted 28 Free Study Groups this week",
+    "✨ 15 New Solved PYQ Papers uploaded to the Open Campus Vault"
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTickerIndex(prev => (prev + 1) % tickerEvents.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleSound = () => {
     const muted = sounds.toggleMute();
@@ -63,6 +80,7 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
 
   const navItems = [
     { id: 'booking', label: 'Book Session (Free)', icon: BookOpen },
+    { id: 'pyq', label: 'PYQ Vault (Notes)', icon: FileText },
     { id: 'tracker', label: 'Session Tracker', icon: Clock },
     { id: 'tutor', label: 'Peer Tutors (Volunteer)', icon: UserCheck },
     { id: 'clubs', label: 'Partner Clubs', icon: Award },
@@ -78,6 +96,19 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#030305]/95 backdrop-blur-2xl transition-all">
+      {/* Live Campus Activity Ticker Bar */}
+      <div className="bg-[#050508] border-b border-white/[0.06] py-1.5 px-6 font-mono text-[11px] text-slate-300 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto w-full flex items-center space-x-3">
+          <span className="flex items-center gap-1 text-[#30D158] font-bold shrink-0">
+            <TrendingUp className="w-3.5 h-3.5" />
+            LIVE CAMPUS ACTIVITY:
+          </span>
+          <span className="text-white truncate font-medium transition-all duration-300">
+            {tickerEvents[tickerIndex]}
+          </span>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-6 sm:px-8 py-4">
         <div className="flex items-center justify-between gap-6">
           {/* Brand Identity */}
@@ -114,7 +145,7 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
               className="hidden md:flex items-center space-x-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15] px-4 py-2.5 rounded-2xl text-xs text-slate-300 transition-all shadow-inner group"
             >
               <Search className="w-4 h-4 text-slate-400 group-hover:text-[#30D158] transition-colors" />
-              <span className="text-slate-400">Search subjects, peer tutors, sessions...</span>
+              <span className="text-slate-400">Search subjects, PYQs, peer tutors...</span>
               <kbd className="bg-white/[0.08] text-slate-400 px-2 py-0.5 rounded-md text-[10px] font-mono border border-white/[0.06]">
                 ⌘K
               </kbd>

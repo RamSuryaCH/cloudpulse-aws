@@ -12,7 +12,7 @@ import {
   Cpu, 
   Database, 
   Terminal, 
-  FlaskConical 
+  FlaskConical
 } from 'lucide-react';
 import { COURSE_SUBJECTS, SESSION_PACKAGES, SEED_CLUBS } from '../../data/prepwiseData';
 import type { CourseSubject, SessionType } from '../../types/prepwise';
@@ -25,6 +25,7 @@ interface BookingStudioProps {
 export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) => {
   const [selectedSubject, setSelectedSubject] = useState<CourseSubject>(COURSE_SUBJECTS[0]);
   const [sessionType, setSessionType] = useState<SessionType>('one_on_one');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [studentName, setStudentName] = useState('');
   const [studentContact, setStudentContact] = useState('');
   const [collegeName, setCollegeName] = useState('VNRVJIET Hyderabad');
@@ -39,6 +40,10 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
       setReferralCode(ref.toUpperCase());
     }
   }, []);
+
+  const filteredSubjects = COURSE_SUBJECTS.filter(s => 
+    activeCategory === 'all' || s.category === activeCategory
+  );
 
   const selectedPackage = SESSION_PACKAGES.find(p => p.id === sessionType) || SESSION_PACKAGES[0];
 
@@ -103,7 +108,7 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
           <Sparkles className="w-3.5 h-3.5" />
           <span>100% Free Campus Peer Learning & Exam Preparation</span>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+        <h1 className="text-4xl sm:text-5xl font-black text-[#FFFFFF] tracking-tight leading-tight">
           Learn Together. <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#30D158] via-[#10B981] to-[#0A84FF]">
             Guided by Campus Senior Peer Tutors.
@@ -122,16 +127,41 @@ export const BookingStudio: React.FC<BookingStudioProps> = ({ onOrderCreated }) 
           
           {/* Step 1: Select Subject */}
           <div className="apple-card p-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
               <h3 className="text-lg font-bold text-white flex items-center gap-2.5">
                 <BookOpen className="w-5 h-5 text-[#30D158]" />
                 1. Select Course Subject
               </h3>
-              <span className="text-xs font-mono text-slate-400">6 Active Campus Subjects</span>
+
+              {/* Category Filter Pills */}
+              <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar">
+                {[
+                  { id: 'all', label: 'All' },
+                  { id: 'computer_science', label: 'CS & Coding' },
+                  { id: 'engineering', label: 'Maths & Engg' },
+                  { id: 'electronics', label: 'Electronics' },
+                  { id: 'basic_sciences', label: 'Sciences' }
+                ].map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      sounds.playClick();
+                      setActiveCategory(cat.id);
+                    }}
+                    className={`px-3 py-1 rounded-full text-xs font-mono font-semibold transition-all ${
+                      activeCategory === cat.id
+                        ? 'bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/40'
+                        : 'bg-white/[0.04] text-slate-400 border border-white/[0.06] hover:bg-white/[0.08]'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {COURSE_SUBJECTS.map((subject) => {
+              {filteredSubjects.map((subject) => {
                 const Icon = getSubjectIcon(subject.icon);
                 const isSelected = selectedSubject.id === subject.id;
                 return (

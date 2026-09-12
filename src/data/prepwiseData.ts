@@ -1,4 +1,4 @@
-import type { CourseSubject, SessionPackage, PartnerClub, TutorProfile, TutoringSession } from '../types/prepwise';
+import type { CourseSubject, SessionPackage, PartnerClub, TutorProfile, TutoringSession, PyqPaper, CampusRoom } from '../types/prepwise';
 
 export const COURSE_SUBJECTS: CourseSubject[] = [
   {
@@ -146,7 +146,8 @@ export const SEED_TUTORS: TutorProfile[] = [
     totalSessionsCompleted: 18,
     rating: 4.9,
     status: 'approved',
-    appliedAt: '2026-08-15T10:00:00.000Z'
+    appliedAt: '2026-08-15T10:00:00.000Z',
+    badge: 'Senior TA'
   },
   {
     id: 'tutor-2',
@@ -158,12 +159,13 @@ export const SEED_TUTORS: TutorProfile[] = [
     major: 'Electronics & Comm Engg (3rd Year)',
     gpa: 9.6,
     subjectsHandled: ['eng-maths-3', 'digital-electronics'],
-    volunteerHours: 26,
-    karmaPoints: 390,
-    totalSessionsCompleted: 14,
+    volunteerHours: 42,
+    karmaPoints: 640,
+    totalSessionsCompleted: 24,
     rating: 4.95,
     status: 'approved',
-    appliedAt: '2026-08-20T14:30:00.000Z'
+    appliedAt: '2026-08-20T14:30:00.000Z',
+    badge: 'Gold Peer Tutor'
   }
 ];
 
@@ -208,4 +210,49 @@ export const SEED_SESSIONS: TutoringSession[] = [
     partnerClubName: 'CSI Student Chapter CBIT',
     createdAt: '2026-09-12T11:15:00.000Z'
   }
+];
+
+export const SEED_PYQS: PyqPaper[] = [
+  {
+    id: 'pyq-dsa-2025',
+    subjectCode: 'CS201',
+    subjectName: 'Data Structures & Algorithms',
+    year: '2025',
+    semester: 'Semester I',
+    type: 'End-Exam',
+    questionsCount: 12,
+    downloads: 1420,
+    solutionSnippet: 'void solveGraphDFS(int u, vector<bool>& vis) { vis[u] = true; for(int v : adj[u]) if(!vis[v]) solveGraphDFS(v, vis); }',
+    topics: ['Dynamic Programming', 'Graph Traversals', 'AVL Trees', 'Red-Black Rotation']
+  },
+  {
+    id: 'pyq-math3-2025',
+    subjectCode: 'MA301',
+    subjectName: 'Engineering Mathematics III',
+    year: '2025',
+    semester: 'Semester I',
+    type: 'Mid-Exam',
+    questionsCount: 8,
+    downloads: 980,
+    solutionSnippet: 'f(z) = u(x,y) + i v(x,y) is analytic if Cauchy-Riemann equations ∂u/∂x = ∂v/∂y and ∂u/∂y = -∂v/∂x hold.',
+    topics: ['Fourier Transforms', 'Complex Analysis', 'Cauchy Integral Formula', 'PDE Separation']
+  },
+  {
+    id: 'pyq-ec204-2025',
+    subjectCode: 'EC204',
+    subjectName: 'Digital Logic & Microprocessors',
+    year: '2025',
+    semester: 'Semester II',
+    type: 'Lab-Viva',
+    questionsCount: 15,
+    downloads: 750,
+    solutionSnippet: 'MOV AX, 0005H \n MOV BX, 0003H \n ADD AX, BX \n HLT ; 8086 Assembly Sum',
+    topics: ['8086 Registers', 'K-Map Minimization', 'Counters', 'Multiplexer Design']
+  }
+];
+
+export const CAMPUS_ROOMS: CampusRoom[] = [
+  { id: 'room-lib-b3', name: 'Library Discussion Room B3', building: 'Central Library Building', capacity: 6, status: 'available', facilities: ['Whiteboard', 'AC', 'WiFi'] },
+  { id: 'room-cs-204', name: 'Academic Block III - Room 204', building: 'CSE Department Block', capacity: 15, status: 'available', facilities: ['Projector', 'Power Sockets'] },
+  { id: 'room-[#050508]', name: 'Student Activity Lounge', building: 'Student Union Building', capacity: 20, status: 'occupied', facilities: ['Smart Screen', 'WiFi'] }
 ];
