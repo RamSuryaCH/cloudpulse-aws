@@ -4,31 +4,179 @@
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 antialiased min-h-screen selection:bg-amber-500 selection:text-black;
+    @apply antialiased min-h-screen selection:bg-amber-500 selection:text-black overflow-x-hidden;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-/* Custom scrollbars */
+/* -------------------------------------------------------------
+   THEME STYLES
+---------------------------------------------------------------- */
+
+/* 1. Aurora Bento (Default & Ultimate Choice for Cloud Tools) */
+.theme-aurora-bento {
+  --bg-main: #090d16;
+  --card-bg: rgba(15, 23, 42, 0.7);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --accent-primary: #FF9900;
+  --accent-glow: rgba(255, 153, 0, 0.25);
+  background-color: var(--bg-main);
+  color: #f8fafc;
+}
+
+/* 2. Cyberpunk Neon */
+.theme-cyberpunk {
+  --bg-main: #050508;
+  --card-bg: rgba(10, 10, 18, 0.85);
+  --card-border: rgba(0, 240, 255, 0.3);
+  --accent-primary: #00F0FF;
+  --accent-glow: rgba(0, 240, 255, 0.4);
+  background-color: var(--bg-main);
+  color: #f1f5f9;
+}
+
+/* 3. Swiss Minimalist */
+.theme-swiss {
+  --bg-main: #0b0c0e;
+  --card-bg: rgba(18, 20, 24, 0.95);
+  --card-border: rgba(255, 255, 255, 0.15);
+  --accent-primary: #ffffff;
+  --accent-glow: rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-main);
+  color: #ffffff;
+}
+
+/* 4. Neobrutalism AWS */
+.theme-neobrutalism {
+  --bg-main: #0d1117;
+  --card-bg: #161b22;
+  --card-border: #FF9900;
+  --accent-primary: #FF9900;
+  --accent-glow: rgba(255, 153, 0, 0.6);
+  background-color: var(--bg-main);
+  color: #ffffff;
+}
+
+/* -------------------------------------------------------------
+   GLASS & BENTO UTILITIES
+---------------------------------------------------------------- */
+
+.bento-card {
+  position: relative;
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-card:hover {
+  border-color: rgba(255, 153, 0, 0.4);
+  box-shadow: 0 16px 40px -12px rgba(255, 153, 0, 0.12), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.theme-neobrutalism .bento-card {
+  border: 2px solid #FF9900;
+  box-shadow: 4px 4px 0px 0px #FF9900;
+  border-radius: 0.5rem;
+}
+
+.theme-neobrutalism .bento-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #FF9900;
+}
+
+.theme-cyberpunk .bento-card {
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.08), inset 0 0 10px rgba(0, 240, 255, 0.04);
+}
+
+.theme-cyberpunk .bento-card:hover {
+  border-color: #00F0FF;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.25), inset 0 0 15px rgba(0, 240, 255, 0.1);
+}
+
+/* -------------------------------------------------------------
+   AURORA LIGHT BLOBS
+---------------------------------------------------------------- */
+
+.aurora-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.aurora-blob-1 {
+  position: absolute;
+  top: -10%;
+  left: 15%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 153, 0, 0.12) 0%, rgba(255, 153, 0, 0) 70%);
+  filter: blur(80px);
+  animation: float-1 18s ease-in-out infinite alternate;
+}
+
+.aurora-blob-2 {
+  position: absolute;
+  top: 40%;
+  right: 10%;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0) 70%);
+  filter: blur(80px);
+  animation: float-2 22s ease-in-out infinite alternate;
+}
+
+.aurora-blob-3 {
+  position: absolute;
+  bottom: -10%;
+  left: 30%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 70%);
+  filter: blur(90px);
+  animation: float-1 25s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes float-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(80px, 60px) scale(1.15); }
+}
+
+@keyframes float-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-60px, -80px) scale(1.2); }
+}
+
+/* Subtle grid overlay */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: rgba(15, 23, 42, 0.6);
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
-}
-
-/* Subtle grid background */
-.bg-grid-pattern {
-  background-size: 30px 30px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background: rgba(255, 153, 0, 0.5);
 }

@@ -29,11 +29,11 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
       icon: Zap,
       status: '600+ POPs',
       details: [
-        { label: 'Distribution ID', value: 'E3B9QZ9P118X74' },
+        { label: 'Distribution ID', value: 'EJW28095DC509' },
         { label: 'Origin Access Control (OAC)', value: 'Enforced (No direct S3 bypass)' },
         { label: 'Cache Policy', value: 'CachingOptimized (1 Year Immutable Hash)' },
         { label: 'Compression', value: 'Gzip & Brotli Auto-Compression' },
-        { label: 'Price Class', value: 'PriceClass_100 (North America & Europe Free)' }
+        { label: 'Live Endpoint', value: 'https://d1pugni5iia6hw.cloudfront.net' }
       ]
     },
     {
@@ -43,7 +43,7 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
       icon: Layers,
       status: '11 9s Durability',
       details: [
-        { label: 'Bucket Name', value: 'cloudpulse-production-assets-2026' },
+        { label: 'Bucket Name', value: 'cloudpulse-app-frontendbucket-arswr5lhouip' },
         { label: 'Public Access Block', value: '100% Blocked (OAC-only read access)' },
         { label: 'Encryption', value: 'Server-Side Encryption SSE-S3 (AES-256)' },
         { label: 'Versioning', value: 'Enabled with 30-Day Lifecycle Retention' }
@@ -59,7 +59,7 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
         { label: 'API Protocol', value: 'HTTP API v2 (Low-latency AWS Proxy)' },
         { label: 'Lambda Runtime', value: 'Node.js 20.x on AWS Graviton3 (ARM64)' },
         { label: 'Memory Allocation', value: '512 MB (Fast compute burst)' },
-        { label: 'Cold Start Latency', value: '< 120ms (Warm latency: 12ms)' }
+        { label: 'Live Endpoint', value: 'https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com' }
       ]
     },
     {
@@ -69,9 +69,9 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
       icon: Database,
       status: 'Zero Idle Cost',
       details: [
+        { label: 'Table Name', value: 'cloudpulse-challenge-data' },
         { label: 'Capacity Mode', value: 'PAY_PER_REQUEST (On-Demand)' },
         { label: 'Point-In-Time Recovery', value: 'Enabled (35-day Continuous Backup)' },
-        { label: 'Data Encryption', value: 'KMS Default Encryption' },
         { label: 'Monthly Base Cost', value: '$0.00 (Within 25 GB Free Tier)' }
       ]
     },
@@ -82,7 +82,7 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
       icon: Zap,
       status: 'Live Alarms',
       details: [
-        { label: 'Log Group', value: '/aws/lambda/cloudpulse-backend' },
+        { label: 'Log Group', value: '/aws/lambda/cloudpulse-challenge-api' },
         { label: 'Metric Alarms', value: 'High Error Rate (>5 errors/min)' },
         { label: 'Distributed Tracing', value: 'AWS X-Ray Active Tracing' },
         { label: 'Log Retention', value: '30 Days Auto-expire' }
@@ -95,31 +95,30 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-6">
+      <div className="bento-card p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              <span className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
                 <Globe className="w-5 h-5" />
               </span>
               <h2 className="text-lg font-bold text-slate-100">Live AWS Deployment Architecture Inspector</h2>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-300/80 mt-1">
               Explore the exact multi-tier AWS cloud infrastructure configured and provisioned for this application.
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <span className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-400 flex items-center gap-2">
+            <span className="px-3.5 py-1.5 rounded-xl bg-slate-950/80 border border-white/10 text-xs font-mono text-emerald-400 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Status: Production Ready
+              Status: Production Live on AWS
             </span>
           </div>
         </div>
       </div>
 
-      {/* Interactive Layer Selection and Details */}
+      {/* Bento Interactive Layer View */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Layer Stack Navigation */}
         <div className="lg:col-span-5 space-y-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">
             Infrastructure Stack Tiers
@@ -131,15 +130,15 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
               <div
                 key={layer.id}
                 onClick={() => setActiveLayer(layer.id)}
-                className={`p-4 rounded-xl border cursor-pointer transition-all duration-150 flex items-center justify-between ${
+                className={`bento-card p-4 cursor-pointer flex items-center justify-between ${
                   isSelected
-                    ? 'bg-amber-500/10 border-amber-500/50 shadow-md shadow-amber-500/5 ring-1 ring-amber-500/30'
-                    : 'bg-slate-900/80 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
+                    ? 'ring-2 ring-amber-500/50 !border-amber-500/60 shadow-lg shadow-amber-500/10'
+                    : 'hover:border-white/20'
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                    isSelected ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400'
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                    isSelected ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400'
                   }`}>
                     <Icon className="w-5 h-5" />
                   </div>
@@ -150,7 +149,7 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-950 text-slate-400 border border-slate-800">
+                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-slate-950 text-slate-400 border border-white/10">
                     {layer.status}
                   </span>
                   <ArrowRight className={`w-4 h-4 ${isSelected ? 'text-amber-400' : 'text-slate-600'}`} />
@@ -160,36 +159,36 @@ export const DeploymentInspector: React.FC<DeploymentInspectorProps> = ({ select
           })}
         </div>
 
-        {/* Layer Details Panel */}
-        <div className="lg:col-span-7 bg-slate-900/80 border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
+        {/* Layer Details Bento Panel */}
+        <div className="lg:col-span-7 bento-card p-6 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
               <div>
                 <span className="text-xs font-mono text-amber-400 uppercase tracking-wider">{selectedLayerData.service}</span>
                 <h3 className="text-base font-bold text-slate-100">{selectedLayerData.name}</h3>
               </div>
-              <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-mono font-medium">
+              <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-mono font-semibold">
                 {selectedLayerData.status}
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {selectedLayerData.details.map((detail, idx) => (
-                <div key={idx} className="p-3.5 rounded-lg bg-slate-950/80 border border-slate-800/80 space-y-1">
+                <div key={idx} className="p-4 rounded-xl bg-slate-950/80 border border-white/10 space-y-1">
                   <span className="text-[11px] text-slate-400 font-mono">{detail.label}</span>
-                  <p className="text-xs font-bold text-slate-200">{detail.value}</p>
+                  <p className="text-xs font-bold text-slate-200 break-all">{detail.value}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-emerald-500/10 border border-amber-500/20 text-xs text-slate-300">
+          <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-emerald-500/10 border border-amber-500/25 text-xs text-slate-300">
             <div className="flex items-center space-x-2 font-bold text-amber-300 mb-1">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
               <span>100% AWS Well-Architected & Free-Tier Compliant</span>
             </div>
             <p className="text-slate-400 text-[11px] leading-relaxed">
-              This deployment configuration is completely reproducible using the included Terraform and AWS CDK infrastructure files located in the <code className="text-amber-300 font-mono">/infra</code> directory.
+              Live AWS production deployment verified in Sydney (`ap-southeast-2`) using CloudFormation, S3 OAC, and CloudFront.
             </p>
           </div>
         </div>

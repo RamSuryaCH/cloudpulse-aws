@@ -1,3 +1,5 @@
+export type UITheme = 'aurora-bento' | 'cyberpunk' | 'swiss' | 'neobrutalism';
+
 export type AWSServiceCategory = 
   | 'compute' 
   | 'storage' 
@@ -61,7 +63,7 @@ export interface SecurityAuditItem {
 }
 
 export interface CostParameters {
-  monthlyRequests: number; // in thousands/millions
+  monthlyRequests: number;
   storageGB: number;
   lambdaExecutions: number;
   avgDurationMs: number;
