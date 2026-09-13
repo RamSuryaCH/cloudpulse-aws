@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { 
   UserCheck, 
   CheckCircle2, 
-  BookOpen, 
   Clock, 
   Star, 
   PlusCircle,
   Award,
-  Sparkles
+  Sparkles,
+  BookOpen
 } from 'lucide-react';
 import { SEED_TUTORS, SEED_SESSIONS, COURSE_SUBJECTS } from '../../data/prepwiseData';
 import type { TutoringSession, TutorProfile } from '../../types/prepwise';
@@ -36,7 +36,8 @@ export const TutorPortal: React.FC = () => {
     }
   };
 
-  const handleApplySubmit = () => {
+  const handleApplySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!applicantName || !applicantPhone || !applicantEmail) {
       alert('Please fill out all required contact fields.');
       return;
@@ -46,7 +47,7 @@ export const TutorPortal: React.FC = () => {
     setTimeout(() => {
       setIsApplyModalOpen(false);
       setApplySubmitted(false);
-    }, 2000);
+    }, 2500);
   };
 
   const handleAcceptJob = (sessionId: string) => {
@@ -68,32 +69,26 @@ export const TutorPortal: React.FC = () => {
     sounds.playSuccess();
     setSessions(prev => prev.map(s => {
       if (s.id === sessionId) {
-        return {
-          ...s,
-          sessionStatus: 'ready'
-        };
+        return { ...s, sessionStatus: 'ready' };
       }
       return s;
     }));
   };
 
-  const availableVerifiedJobs = sessions.filter(s => s.sessionStatus === 'requested');
+  const availableJobs = sessions.filter(s => s.sessionStatus === 'requested');
   const myAssignedJobs = sessions.filter(s => s.tutorId === activeTutor.id);
 
   return (
-    <div className="space-y-12">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-3 max-w-3xl">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#30D158]/10 border border-[#30D158]/30 text-[#30D158] text-xs font-mono font-semibold">
-            <UserCheck className="w-3.5 h-3.5" />
-            <span>Campus Volunteer Peer Tutors & Senior TAs</span>
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Peer Tutor Portal
+    <div className="max-w-5xl mx-auto space-y-10">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-2">
+          <span className="text-xs font-semibold text-pw-accent uppercase tracking-wider">Volunteer Peer Teaching</span>
+          <h1 className="text-3xl sm:text-4xl font-bold text-pw-text">
+            Volunteer Peer Tutor Hub
           </h1>
-          <p className="text-base text-slate-400 leading-relaxed">
-            Conduct 1-on-1 exam prep and group study sessions on your campus. Earn academic Karma points, volunteer hours recognition, and campus leadership badges.
+          <p className="text-base text-pw-secondary leading-relaxed max-w-xl">
+            Help juniors pass tough semester exams, earn verified volunteer service hours, and build campus leadership recognition.
           </p>
         </div>
 
@@ -102,254 +97,291 @@ export const TutorPortal: React.FC = () => {
             sounds.playClick();
             setIsApplyModalOpen(true);
           }}
-          className="flex items-center space-x-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#30D158] to-[#10B981] text-black font-extrabold text-xs shadow-xl shadow-[#30D158]/20 transition-all active:scale-95 duration-150 cursor-pointer shrink-0"
+          className="pw-button-primary text-xs py-2.5 px-5 flex items-center space-x-2 shrink-0 self-start sm:self-center"
         >
-          <PlusCircle className="w-4 h-4 stroke-[2.5]" />
-          <span>Apply to Become a Peer Tutor</span>
+          <PlusCircle className="w-4 h-4" />
+          <span>Apply to Become a Tutor</span>
         </button>
       </div>
 
       {/* Tutor Profile Summary Card */}
-      <div className="apple-card p-8 bg-[#050508] border-2 border-[#30D158]/30">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
+      <div className="pw-card p-6 sm:p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-pw-border">
           <div className="flex items-center space-x-4">
-            <div className="w-14 h-14 rounded-2xl bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/40 flex items-center justify-center font-black text-xl">
-              {activeTutor.name[0]}
+            <div className="w-12 h-12 rounded-xl bg-pw-accent text-white flex items-center justify-center font-bold text-lg">
+              {activeTutor.name.charAt(0)}
             </div>
             <div>
-              <h3 className="text-lg font-black text-white">{activeTutor.name}</h3>
-              <span className="text-xs font-mono text-slate-400 block">{activeTutor.college} • GPA {activeTutor.gpa}</span>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-lg font-bold text-pw-text">{activeTutor.name}</h3>
+                <span className="text-[11px] font-semibold text-pw-accent bg-pw-accent-subtle px-2 py-0.5 rounded border border-pw-accent-border">
+                  {activeTutor.badge || 'Senior TA'}
+                </span>
+              </div>
+              <p className="text-xs text-pw-secondary">{activeTutor.college} • {activeTutor.major}</p>
             </div>
           </div>
 
-          <div className="font-mono text-xs space-y-1">
-            <span className="text-slate-400 uppercase tracking-wider text-[10px] block">Volunteer Recognition</span>
-            <span className="text-lg font-bold text-[#30D158] flex items-center gap-1">
-              <Award className="w-4 h-4" /> {activeTutor.volunteerHours} Hours
+          <div className="flex items-center space-x-2 text-xs font-semibold text-pw-success bg-pw-success-subtle px-3 py-1.5 rounded-lg border border-pw-success/30">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Verified Peer Tutor</span>
+          </div>
+        </div>
+
+        {/* 4 Key Metrics */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          <div className="bg-pw-subtle p-4 rounded-xl border border-pw-border">
+            <span className="block text-2xl font-bold text-pw-text font-display">{activeTutor.karmaPoints}</span>
+            <span className="text-xs text-pw-secondary font-medium flex items-center justify-center gap-1 mt-0.5">
+              <Sparkles className="w-3.5 h-3.5 text-pw-accent" /> Karma Points
             </span>
-            <span className="text-slate-400 text-[11px] block">Verified Academic Credit</span>
           </div>
 
-          <div className="font-mono text-xs space-y-1">
-            <span className="text-slate-400 uppercase tracking-wider text-[10px] block">Karma Points</span>
-            <span className="text-lg font-bold text-[#0A84FF] flex items-center gap-1">
-              <Sparkles className="w-4 h-4" /> {activeTutor.karmaPoints} PTS
+          <div className="bg-pw-subtle p-4 rounded-xl border border-pw-border">
+            <span className="block text-2xl font-bold text-pw-text font-display">{activeTutor.volunteerHours}h</span>
+            <span className="text-xs text-pw-secondary font-medium flex items-center justify-center gap-1 mt-0.5">
+              <Clock className="w-3.5 h-3.5 text-pw-accent" /> Service Hours
             </span>
-            <span className="text-slate-400 text-[11px] block">Top Campus Ranker</span>
           </div>
 
-          <div className="font-mono text-xs space-y-1">
-            <span className="text-slate-400 uppercase tracking-wider text-[10px] block">Student Rating</span>
-            <div className="flex items-center gap-1 text-lg font-bold text-amber-400">
-              <Star className="w-4 h-4 fill-current text-[#F59E0B]" />
-              <span>{activeTutor.rating} / 5.0</span>
-            </div>
-            <span className="text-slate-400 text-[11px] block">{activeTutor.totalSessionsCompleted} Completed Sessions</span>
+          <div className="bg-pw-subtle p-4 rounded-xl border border-pw-border">
+            <span className="block text-2xl font-bold text-pw-text font-display">{activeTutor.totalSessionsCompleted}</span>
+            <span className="text-xs text-pw-secondary font-medium flex items-center justify-center gap-1 mt-0.5">
+              <Award className="w-3.5 h-3.5 text-pw-accent" /> Sessions Done
+            </span>
+          </div>
+
+          <div className="bg-pw-subtle p-4 rounded-xl border border-pw-border">
+            <span className="block text-2xl font-bold text-pw-text font-display">{activeTutor.rating} ★</span>
+            <span className="text-xs text-pw-secondary font-medium flex items-center justify-center gap-1 mt-0.5">
+              <Star className="w-3.5 h-3.5 text-amber-500 fill-current" /> Avg Rating
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Workspaces Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Grid: Open Student Requests vs My Active Sessions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* Left Column: Requested Sessions Queue (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="apple-card p-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2.5 font-mono">
-                <BookOpen className="w-5 h-5 text-[#30D158]" />
-                Requested Free Peer Sessions Queue
-              </h3>
-              <span className="text-xs text-[#30D158] font-mono font-bold bg-[#30D158]/10 px-2.5 py-0.5 rounded-full border border-[#30D158]/30">
-                {availableVerifiedJobs.length} Available
-              </span>
-            </div>
-
-            {availableVerifiedJobs.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 font-mono text-xs">
-                No unassigned session requests currently in the queue. New student requests will appear here instantly.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {availableVerifiedJobs.map((job) => (
-                  <div key={job.id} className="p-6 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.15] transition-all space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <span className="font-extrabold text-base text-white block mb-1">{job.courseName}</span>
-                        <span className="text-xs font-mono text-slate-400 block">{job.studentName} • {job.collegeName}</span>
-                      </div>
-                      <span className="text-sm font-mono font-black text-[#30D158] bg-[#30D158]/10 px-3 py-1 rounded-full border border-[#30D158]/30">
-                        FREE
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-2 border-t border-white/[0.06]">
-                      <span>Format: <strong className="text-white capitalize">{job.sessionType.replace('_', ' ')}</strong></span>
-                      <button
-                        onClick={() => handleAcceptJob(job.id)}
-                        className="px-4 py-2 rounded-xl bg-[#30D158] hover:bg-[#34D399] text-black font-extrabold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
-                      >
-                        Accept Session Request
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* Open Queue */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-base text-pw-text">Open Student Requests</h3>
+            <span className="text-xs font-semibold text-pw-accent bg-pw-accent-subtle px-2.5 py-0.5 rounded-full border border-pw-accent-border">
+              {availableJobs.length} Available
+            </span>
           </div>
+
+          {availableJobs.length === 0 ? (
+            <div className="pw-card p-8 text-center text-pw-secondary text-xs">
+              No new pending student requests right now. Great job keeping the queue clear!
+            </div>
+          ) : (
+            availableJobs.map(job => (
+              <div key={job.id} className="pw-card p-5 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="font-bold text-sm text-pw-text">{job.courseName}</h4>
+                    <span className="text-xs text-pw-secondary block capitalize">{job.sessionType.replace('_', ' ')} • {job.collegeName}</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-pw-secondary bg-pw-subtle px-2 py-0.5 rounded border border-pw-border">
+                    {job.studentName}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-pw-border">
+                  <span className="text-xs text-pw-secondary">Reward: +20 Karma & 1.0h</span>
+                  <button
+                    onClick={() => handleAcceptJob(job.id)}
+                    className="pw-button-primary text-xs py-1.5 px-3"
+                  >
+                    Accept Session
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
-        {/* Right Column: My Active & Assigned Sessions (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="apple-card p-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2.5 font-mono">
-                <Clock className="w-5 h-5 text-[#0A84FF]" />
-                My Accepted Sessions
-              </h3>
-              <span className="text-xs font-mono text-slate-400">{myAssignedJobs.length} Sessions</span>
+        {/* My Assigned Sessions */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-base text-pw-text">My Assigned Sessions</h3>
+            <span className="text-xs font-semibold text-pw-secondary bg-pw-subtle px-2.5 py-0.5 rounded-full border border-pw-border">
+              {myAssignedJobs.length} Active
+            </span>
+          </div>
+
+          {myAssignedJobs.length === 0 ? (
+            <div className="pw-card p-8 text-center text-pw-secondary text-xs">
+              You have no active sessions assigned. Accept one from the open queue on the left!
             </div>
-
-            <div className="space-y-4">
-              {myAssignedJobs.map((job) => (
-                <div key={job.id} className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] space-y-3">
-                  <div className="flex justify-between items-start">
-                    <span className="font-bold text-sm text-white">{job.courseName}</span>
-                    <span className="text-xs font-mono text-[#30D158] font-bold">FREE</span>
+          ) : (
+            myAssignedJobs.map(job => (
+              <div key={job.id} className="pw-card p-5 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="font-bold text-sm text-pw-text">{job.courseName}</h4>
+                    <span className="text-xs text-pw-secondary block">Student: {job.studentName} ({job.studentContact})</span>
                   </div>
+                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+                    job.sessionStatus === 'completed' 
+                      ? 'bg-pw-success-subtle text-pw-success border border-pw-success/30'
+                      : job.sessionStatus === 'ready'
+                      ? 'bg-pw-accent-subtle text-pw-accent border border-pw-accent-border'
+                      : 'bg-pw-warning-subtle text-pw-warning border border-pw-warning/30'
+                  }`}>
+                    {job.sessionStatus.toUpperCase()}
+                  </span>
+                </div>
 
-                  <div className="text-xs font-mono text-slate-400 space-y-1">
-                    <div>Student: <span className="text-white">{job.studentName}</span> ({job.studentContact})</div>
-                    <div>Status: <span className="text-[#30D158] uppercase font-bold">{job.sessionStatus}</span></div>
-                  </div>
+                <div className="text-xs text-pw-secondary bg-pw-subtle p-2.5 rounded-lg border border-pw-border">
+                  Venue: {job.locationOrLink || 'Library Discussion Room B3'}
+                </div>
 
-                  {job.sessionStatus === 'assigned' && (
+                {job.sessionStatus === 'assigned' && (
+                  <div className="pt-2 border-t border-pw-border flex justify-end">
                     <button
                       onClick={() => handleMarkReady(job.id)}
-                      className="w-full py-2 rounded-xl bg-[#0A84FF] hover:bg-[#3894FF] text-white font-mono text-xs font-bold transition-all"
+                      className="pw-button-secondary text-xs py-1.5 px-3 flex items-center space-x-1"
                     >
-                      Mark Session Ready on Campus
+                      <CheckCircle2 className="w-3.5 h-3.5 text-pw-accent" />
+                      <span>Mark Ready at Venue</span>
                     </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
+
       </div>
 
-      {/* Become a Tutor Application Modal */}
+      {/* Tutor Application Modal */}
       {isApplyModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="apple-card max-w-lg w-full p-8 space-y-6 relative border-2 border-[#30D158]/40">
-            <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
-              <h3 className="text-lg font-black text-white">Peer Tutor Application</h3>
-              <span className="text-xs font-mono text-[#30D158] bg-[#30D158]/10 px-3 py-1 rounded-full border border-[#30D158]/30 font-bold">
-                Volunteer Community Role
-              </span>
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-pw-border shadow-pw-dropdown max-w-lg w-full p-6 sm:p-8 space-y-6 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-4 border-b border-pw-border">
+              <div>
+                <h3 className="text-lg font-bold text-pw-text flex items-center gap-2">
+                  <UserCheck className="w-5 h-5 text-pw-accent" />
+                  Apply to Become a Senior Peer Tutor
+                </h3>
+                <span className="text-xs text-pw-secondary">Teach juniors & earn academic volunteer hours</span>
+              </div>
+              <button
+                onClick={() => setIsApplyModalOpen(false)}
+                className="text-pw-tertiary hover:text-pw-text text-lg font-bold p-1"
+              >
+                ✕
+              </button>
             </div>
 
             {applySubmitted ? (
-              <div className="py-8 text-center space-y-3">
-                <CheckCircle2 className="w-12 h-12 text-[#30D158] mx-auto" />
-                <h4 className="text-xl font-bold text-white">Application Submitted!</h4>
-                <p className="text-xs text-slate-300 font-mono">Our campus coordinator will review your GPA and subject expertise within 24 hours.</p>
+              <div className="p-6 rounded-xl bg-pw-success-subtle border border-pw-success/30 text-center space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-pw-success mx-auto" />
+                <h4 className="font-bold text-pw-text">Application Submitted!</h4>
+                <p className="text-xs text-pw-secondary">Campus coordinators will review your GPA and contact you via WhatsApp.</p>
               </div>
             ) : (
-              <div className="space-y-4 text-xs font-mono">
+              <form onSubmit={handleApplySubmit} className="space-y-4">
                 <div>
-                  <label className="text-slate-300 block mb-1">Full Name *</label>
+                  <label className="block text-xs font-medium text-pw-text mb-1">Full Name *</label>
                   <input
                     type="text"
-                    placeholder="e.g. Arjun Reddy"
+                    required
+                    placeholder="e.g. Sneha Kulkarni"
                     value={applicantName}
                     onChange={(e) => setApplicantName(e.target.value)}
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
+                    className="w-full pw-input"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-slate-300 block mb-1">College Email *</label>
+                    <label className="block text-xs font-medium text-pw-text mb-1">Email *</label>
                     <input
                       type="email"
-                      placeholder="arjun@student.vnrvjiet.ac.in"
+                      required
+                      placeholder="college email"
                       value={applicantEmail}
                       onChange={(e) => setApplicantEmail(e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
+                      className="w-full pw-input"
                     />
                   </div>
                   <div>
-                    <label className="text-slate-300 block mb-1">WhatsApp / Phone *</label>
+                    <label className="block text-xs font-medium text-pw-text mb-1">WhatsApp Phone *</label>
                     <input
-                      type="text"
-                      placeholder="+91 98490 12345"
+                      type="tel"
+                      required
+                      placeholder="+91..."
                       value={applicantPhone}
                       onChange={(e) => setApplicantPhone(e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
+                      className="w-full pw-input"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-slate-300 block mb-1">College Campus</label>
+                    <label className="block text-xs font-medium text-pw-text mb-1">Campus</label>
                     <input
                       type="text"
                       value={applicantCollege}
                       onChange={(e) => setApplicantCollege(e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
+                      className="w-full pw-input"
                     />
                   </div>
                   <div>
-                    <label className="text-slate-300 block mb-1">Current GPA *</label>
+                    <label className="block text-xs font-medium text-pw-text mb-1">Current CGPA (8.5+)</label>
                     <input
                       type="text"
                       value={applicantGpa}
                       onChange={(e) => setApplicantGpa(e.target.value)}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#30D158]"
+                      className="w-full pw-input font-mono"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-slate-300 block mb-2">Select Subjects You Can Teach:</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {COURSE_SUBJECTS.map((sub) => {
-                      const isSel = selectedSubjects.includes(sub.id);
+                  <label className="block text-xs font-medium text-pw-text mb-2">Subjects you can teach:</label>
+                  <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto p-1">
+                    {COURSE_SUBJECTS.map(s => {
+                      const isSelected = selectedSubjects.includes(s.id);
                       return (
-                        <button
-                          key={sub.id}
-                          type="button"
-                          onClick={() => handleToggleSubject(sub.id)}
-                          className={`p-2.5 rounded-xl border text-[11px] text-left transition-all ${
-                            isSel
-                              ? 'bg-[#30D158]/20 text-[#30D158] border-[#30D158]'
-                              : 'bg-white/[0.04] text-slate-400 border-white/[0.08]'
+                        <div
+                          key={s.id}
+                          onClick={() => handleToggleSubject(s.id)}
+                          className={`p-2 rounded-lg border text-xs cursor-pointer flex items-center space-x-2 transition-colors ${
+                            isSelected
+                              ? 'bg-pw-accent-subtle border-pw-accent text-pw-accent font-semibold'
+                              : 'bg-pw-subtle border-pw-border text-pw-secondary'
                           }`}
                         >
-                          {sub.code} • {sub.name.slice(0, 22)}...
-                        </button>
+                          <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate">{s.code}</span>
+                        </div>
                       );
                     })}
                   </div>
                 </div>
 
-                <div className="flex space-x-3 pt-4 border-t border-white/[0.08]">
+                <div className="pt-2 flex justify-end space-x-3">
                   <button
+                    type="button"
                     onClick={() => setIsApplyModalOpen(false)}
-                    className="flex-1 py-3 rounded-xl bg-white/[0.04] text-slate-400 font-bold"
+                    className="pw-button-secondary text-xs py-2 px-4"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={handleApplySubmit}
-                    className="flex-1 py-3 rounded-xl bg-[#30D158] text-black font-extrabold shadow-lg"
+                    type="submit"
+                    className="pw-button-primary text-xs py-2 px-5"
                   >
-                    Submit Peer Application
+                    Submit Application
                   </button>
                 </div>
-              </div>
+              </form>
             )}
           </div>
         </div>

@@ -254,5 +254,5 @@ export const SEED_PYQS: PyqPaper[] = [
 export const CAMPUS_ROOMS: CampusRoom[] = [
   { id: 'room-lib-b3', name: 'Library Discussion Room B3', building: 'Central Library Building', capacity: 6, status: 'available', facilities: ['Whiteboard', 'AC', 'WiFi'] },
   { id: 'room-cs-204', name: 'Academic Block III - Room 204', building: 'CSE Department Block', capacity: 15, status: 'available', facilities: ['Projector', 'Power Sockets'] },
-  { id: 'room-[#050508]', name: 'Student Activity Lounge', building: 'Student Union Building', capacity: 20, status: 'occupied', facilities: ['Smart Screen', 'WiFi'] }
+  { id: 'room-sal-01', name: 'Student Activity Lounge', building: 'Student Union Building', capacity: 20, status: 'occupied', facilities: ['Smart Screen', 'WiFi'] }
 ];

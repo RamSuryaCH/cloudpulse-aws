@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
   GraduationCap, 
-  BookOpen, 
   Search, 
   Volume2, 
   VolumeX, 
-  Sparkles, 
-  UserCheck, 
-  ShieldCheck, 
-  Award, 
-  Clock, 
   Building2,
-  FileText,
-  TrendingUp
+  Menu,
+  X
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { sounds } from '../../utils/soundEffects';
 
 interface PrepWiseHeaderProps {
@@ -33,21 +26,7 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
   onOpenCommandPalette,
 }) => {
   const [isMuted, setIsMuted] = useState(sounds.getMuted());
-  const [tickerIndex, setTickerIndex] = useState(0);
-
-  const tickerEvents = [
-    "🔥 Rahul V. (VNRVJIET) requested Data Structures 1-on-1 Exam Sprint",
-    "⚡ Sneha K. (CBIT) completed Math III Session with 5.0 ★ Rating",
-    "📚 AWS Cloud Club VNRVJIET hosted 28 Free Study Groups this week",
-    "✨ 15 New Solved PYQ Papers uploaded to the Open Campus Vault"
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTickerIndex(prev => (prev + 1) % tickerEvents.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleSound = () => {
     const muted = sounds.toggleMute();
@@ -55,16 +34,6 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
     if (!muted) {
       sounds.playSuccess();
     }
-  };
-
-  const triggerCelebration = () => {
-    sounds.playSuccess();
-    confetti({
-      particleCount: 120,
-      spread: 80,
-      origin: { y: 0.5 },
-      colors: ['#30D158', '#0A84FF', '#A855F7', '#FFFFFF']
-    });
   };
 
   useEffect(() => {
@@ -79,12 +48,13 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
   }, [onOpenCommandPalette]);
 
   const navItems = [
-    { id: 'booking', label: 'Book Session (Free)', icon: BookOpen },
-    { id: 'pyq', label: 'PYQ Vault (Notes)', icon: FileText },
-    { id: 'tracker', label: 'Session Tracker', icon: Clock },
-    { id: 'tutor', label: 'Peer Tutors (Volunteer)', icon: UserCheck },
-    { id: 'clubs', label: 'Partner Clubs', icon: Award },
-    { id: 'admin', label: 'Campus Admin', icon: ShieldCheck },
+    { id: 'home', label: 'Home' },
+    { id: 'booking', label: 'Book Session' },
+    { id: 'pyq', label: 'PYQ Vault' },
+    { id: 'tracker', label: 'Tracker' },
+    { id: 'tutor', label: 'Volunteer' },
+    { id: 'clubs', label: 'Clubs' },
+    { id: 'admin', label: 'Admin' },
   ];
 
   const colleges = [
@@ -95,65 +65,76 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#030305]/95 backdrop-blur-2xl transition-all">
-      {/* Live Campus Activity Ticker Bar */}
-      <div className="bg-[#050508] border-b border-white/[0.06] py-1.5 px-6 font-mono text-[11px] text-slate-300 flex items-center justify-between">
-        <div className="max-w-7xl mx-auto w-full flex items-center space-x-3">
-          <span className="flex items-center gap-1 text-[#30D158] font-bold shrink-0">
-            <TrendingUp className="w-3.5 h-3.5" />
-            LIVE CAMPUS ACTIVITY:
-          </span>
-          <span className="text-white truncate font-medium transition-all duration-300">
-            {tickerEvents[tickerIndex]}
-          </span>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 py-4">
-        <div className="flex items-center justify-between gap-6">
-          {/* Brand Identity */}
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-pw-border transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
+          
+          {/* Brand Logo & Name */}
           <div 
-            className="flex items-center space-x-3.5 cursor-pointer select-none group" 
+            className="flex items-center space-x-3 cursor-pointer select-none group" 
             onClick={() => {
               sounds.playClick();
-              setActiveTab('booking');
+              setActiveTab('home');
             }}
           >
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#30D158] via-[#10B981] to-[#0A84FF] flex items-center justify-center text-black font-bold shadow-lg shadow-[#30D158]/20 ring-1 ring-white/20 group-hover:scale-105 transition-transform duration-200">
-              <GraduationCap className="w-6 h-6 text-black stroke-[2.3]" />
+            <div className="w-10 h-10 rounded-xl bg-pw-accent text-white flex items-center justify-center font-bold shadow-sm group-hover:bg-pw-accent-hover transition-colors">
+              <GraduationCap className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xl font-black text-white tracking-tight">PrepWise <span className="text-[#30D158] font-mono font-semibold text-xs px-2 py-0.5 rounded-md bg-[#30D158]/15 border border-[#30D158]/30 ml-0.5">CAMPUS</span></span>
-                <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[#30D158]/10 text-[#30D158] border border-[#30D158]/30 font-bold tracking-wider flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#30D158] animate-pulse"></span>
-                  100% FREE PLATFORM
+                <span className="text-lg font-bold text-pw-text tracking-tight font-display">PrepWise</span>
+                <span className="text-[11px] font-semibold text-pw-accent bg-pw-accent-subtle px-2 py-0.5 rounded-md border border-pw-accent-border">
+                  CAMPUS
                 </span>
               </div>
-              <p className="text-xs text-slate-400 hidden sm:block">Open Campus Peer Tutoring & Knowledge Exchange</p>
+              <span className="text-[11px] text-pw-secondary hidden md:block">100% Free Peer Tutoring</span>
             </div>
           </div>
 
-          {/* Quick Controls */}
-          <div className="flex items-center space-x-3">
-            {/* Spotlight Search */}
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    sounds.playSwitch();
+                    setActiveTab(item.id);
+                  }}
+                  className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all ${
+                    isActive
+                      ? 'bg-pw-subtle text-pw-text font-semibold'
+                      : 'text-pw-secondary hover:text-pw-text hover:bg-pw-subtle/60'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Right Controls */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Spotlight Search (Cmd+K) */}
             <button
               onClick={() => {
                 sounds.playClick();
                 onOpenCommandPalette();
               }}
-              className="hidden md:flex items-center space-x-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15] px-4 py-2.5 rounded-2xl text-xs text-slate-300 transition-all shadow-inner group"
+              className="hidden lg:flex items-center space-x-2 bg-pw-subtle hover:bg-pw-muted/70 border border-pw-border px-3 py-1.5 rounded-lg text-xs text-pw-secondary transition-colors"
+              title="Search subjects, PYQs (Cmd+K)"
             >
-              <Search className="w-4 h-4 text-slate-400 group-hover:text-[#30D158] transition-colors" />
-              <span className="text-slate-400">Search subjects, PYQs, peer tutors...</span>
-              <kbd className="bg-white/[0.08] text-slate-400 px-2 py-0.5 rounded-md text-[10px] font-mono border border-white/[0.06]">
+              <Search className="w-3.5 h-3.5 text-pw-tertiary" />
+              <span>Search</span>
+              <kbd className="bg-white text-pw-secondary px-1.5 py-0.5 rounded text-[10px] font-mono border border-pw-border shadow-xs">
                 ⌘K
               </kbd>
             </button>
 
             {/* Campus Selector */}
-            <div className="flex items-center space-x-2 bg-white/[0.04] border border-white/[0.08] px-3.5 py-2.5 rounded-2xl text-xs shadow-inner">
-              <Building2 className="w-4 h-4 text-[#30D158]" />
+            <div className="flex items-center space-x-1.5 bg-pw-subtle border border-pw-border px-2.5 py-1.5 rounded-lg text-xs">
+              <Building2 className="w-3.5 h-3.5 text-pw-accent shrink-0" />
               <select
                 value={selectedCollege}
                 onChange={(e) => {
@@ -161,10 +142,10 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
                   setSelectedCollege(e.target.value);
                 }}
                 aria-label="Select Campus"
-                className="bg-transparent text-slate-200 font-medium text-xs focus:outline-none cursor-pointer pr-1"
+                className="bg-transparent text-pw-text font-medium text-xs focus:outline-none cursor-pointer pr-1"
               >
                 {colleges.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-[#0C0C12] text-slate-200 py-1">
+                  <option key={c.id} value={c.id} className="text-pw-text py-1">
                     {c.name}
                   </option>
                 ))}
@@ -175,47 +156,47 @@ export const PrepWiseHeader: React.FC<PrepWiseHeaderProps> = ({
             <button
               onClick={toggleSound}
               title={isMuted ? "Enable sound feedback" : "Mute sound feedback"}
-              className="w-10 h-10 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center justify-center text-slate-300 transition-colors"
+              className="w-9 h-9 rounded-lg bg-pw-subtle hover:bg-pw-muted/70 border border-pw-border flex items-center justify-center text-pw-secondary transition-colors"
             >
-              {isMuted ? <VolumeX className="w-4 h-4 text-slate-500" /> : <Volume2 className="w-4 h-4 text-[#30D158]" />}
+              {isMuted ? <VolumeX className="w-4 h-4 text-pw-tertiary" /> : <Volume2 className="w-4 h-4 text-pw-accent" />}
             </button>
 
-            {/* Celebrate Action */}
+            {/* Mobile Hamburger Toggle */}
             <button
-              onClick={triggerCelebration}
-              title="Celebrate peer learning"
-              className="hidden lg:flex items-center space-x-1.5 px-3.5 py-2.5 rounded-2xl bg-[#30D158]/10 hover:bg-[#30D158]/20 border border-[#30D158]/30 text-[#30D158] text-xs font-semibold transition-all active:scale-95"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden w-9 h-9 rounded-lg bg-pw-subtle hover:bg-pw-muted border border-pw-border flex items-center justify-center text-pw-text"
+              aria-label="Toggle navigation menu"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>Celebrate 🎉</span>
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Fluid Pill Navigation */}
-        <div className="mt-4 apple-nav-bar flex space-x-2 overflow-x-auto no-scrollbar">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  sounds.playSwitch();
-                  setActiveTab(item.id);
-                }}
-                className={`flex-1 flex items-center justify-center space-x-2.5 px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 ${
-                  isActive
-                    ? 'bg-white/[0.12] text-[#30D158] shadow-md border border-[#30D158]/40'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#30D158]' : 'text-slate-400'}`} />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
+        {/* Mobile Dropdown Nav */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden py-3 border-t border-pw-border space-y-1">
+            {navItems.map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    sounds.playSwitch();
+                    setActiveTab(item.id);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-pw-accent-subtle text-pw-accent font-semibold'
+                      : 'text-pw-secondary hover:bg-pw-subtle'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </header>
   );

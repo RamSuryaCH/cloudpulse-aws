@@ -4,7 +4,7 @@
  * Triggered by: Amazon API Gateway v2 (HTTP API AWS_PROXY)
  */
 
-const { DynamoDBClient, PutItemCommand, ScanCommand, GetItemCommand, UpdateItemCommand } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBClient, PutItemCommand, ScanCommand, UpdateItemCommand } = require('@aws-sdk/client-dynamodb');
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 
 const TABLE_NAME = process.env.DYNAMODB_TABLE || 'cloudpulse-challenge-data';

@@ -6,14 +6,15 @@ import {
   MapPin, 
   Star, 
   Send, 
-  ShieldCheck, 
-  Sparkles, 
   Copy, 
-  Check 
+  Check,
+  Search,
+  Sparkles
 } from 'lucide-react';
 import { SEED_SESSIONS } from '../../data/prepwiseData';
 import type { TutoringSession } from '../../types/prepwise';
 import { sounds } from '../../utils/soundEffects';
+import { API_BASE_URL } from '../../utils/apiConfig';
 
 interface StudentTrackerProps {
   initialToken?: string | null;
@@ -35,17 +36,17 @@ export const StudentTracker: React.FC<StudentTrackerProps> = ({ initialToken }) 
     sounds.playClick();
     setLoading(true);
     try {
-      const res = await fetch(`https://pmaj9rfa04.execute-api.ap-southeast-2.amazonaws.com/api/prepwise/sessions/track?token=${encodeURIComponent(tok)}`);
+      const res = await fetch(`${API_BASE_URL}/api/prepwise/sessions/track?token=${encodeURIComponent(tok.trim())}`);
       const data = await res.json();
       if (res.ok && data.session) {
         sounds.playSuccess();
         setSession(data.session);
       } else {
-        const seedMatch = SEED_SESSIONS.find(s => s.publicToken === tok) || SEED_SESSIONS[0];
+        const seedMatch = SEED_SESSIONS.find(s => s.publicToken === tok.trim()) || SEED_SESSIONS[0];
         setSession(seedMatch);
       }
     } catch {
-      const seedMatch = SEED_SESSIONS.find(s => s.publicToken === tok) || SEED_SESSIONS[0];
+      const seedMatch = SEED_SESSIONS.find(s => s.publicToken === tok.trim()) || SEED_SESSIONS[0];
       setSession(seedMatch);
     } finally {
       setLoading(false);
@@ -67,251 +68,249 @@ export const StudentTracker: React.FC<StudentTrackerProps> = ({ initialToken }) 
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  const handleReviewSubmit = () => {
+  const handleReviewSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     sounds.playSuccess();
     setReviewSubmitted(true);
   };
 
-  const getStatusBadge = (sessionStatus: string) => {
-    if (sessionStatus === 'completed') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#30D158]/10 text-[#30D158] border border-[#30D158]/30 font-mono text-xs font-bold">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          Session Completed
-        </span>
-      );
+  const getStatusDisplay = (sessionStatus: string) => {
+    switch (sessionStatus) {
+      case 'completed':
+        return {
+          label: 'Session Completed',
+          className: 'bg-pw-success-subtle text-pw-success border-pw-success/30',
+          icon: CheckCircle2
+        };
+      case 'ready':
+        return {
+          label: 'Tutor Ready at Campus Venue',
+          className: 'bg-pw-accent-subtle text-pw-accent border-pw-accent-border',
+          icon: Sparkles
+        };
+      case 'assigned':
+        return {
+          label: 'Senior TA Assigned',
+          className: 'bg-pw-accent-subtle text-pw-accent border-pw-accent-border',
+          icon: User
+        };
+      default:
+        return {
+          label: 'Matching Senior TA',
+          className: 'bg-pw-warning-subtle text-pw-warning border-pw-warning/30',
+          icon: Clock
+        };
     }
-
-    if (sessionStatus === 'ready') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0A84FF]/10 text-[#0A84FF] border border-[#0A84FF]/30 font-mono text-xs font-bold">
-          <Sparkles className="w-3.5 h-3.5" />
-          Tutor Ready on Campus
-        </span>
-      );
-    }
-
-    if (sessionStatus === 'assigned') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#30D158]/10 text-[#30D158] border border-[#30D158]/30 font-mono text-xs font-bold">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          Peer Tutor Assigned
-        </span>
-      );
-    }
-
-    return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0A84FF]/10 text-[#0A84FF] border border-[#0A84FF]/30 font-mono text-xs font-bold">
-        <Clock className="w-3.5 h-3.5 animate-spin" />
-        Session Requested — Matching Tutor
-      </span>
-    );
   };
 
+  const statusInfo = session ? getStatusDisplay(session.sessionStatus) : null;
+  const StatusIcon = statusInfo?.icon;
+
   return (
-    <div className="space-y-12">
-      {/* Search Token Header */}
-      <div className="space-y-4 max-w-3xl">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#30D158]/10 border border-[#30D158]/30 text-[#30D158] text-xs font-mono font-semibold">
-          <Clock className="w-3.5 h-3.5" />
-          <span>Single-Token Secure Student Session Tracker</span>
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-          Track Your Free Session
+    <div className="max-w-4xl mx-auto space-y-10">
+      {/* Header */}
+      <div className="space-y-4">
+        <span className="text-xs font-semibold text-pw-accent uppercase tracking-wider">Live Status Lookup</span>
+        <h1 className="text-3xl sm:text-4xl font-bold text-pw-text">
+          Track Your Free Study Session
         </h1>
-        <p className="text-base text-slate-400 leading-relaxed">
-          Enter your session token to view assigned peer tutor details, campus meeting venue, and post-session feedback.
+        <p className="text-base text-pw-secondary leading-relaxed">
+          Enter your session token to check assigned TA details, study venue, and post-session review status.
         </p>
 
         {/* Token Search Bar */}
-        <div className="flex space-x-3 max-w-xl">
-          <input
-            type="text"
-            placeholder="Enter publicToken (e.g. pw-tok-78901)"
-            value={tokenInput}
-            onChange={(e) => setTokenInput(e.target.value)}
-            className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-2xl px-5 py-3 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-[#30D158]"
-          />
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-pw-tertiary absolute left-3.5 top-3.5" />
+            <input
+              type="text"
+              placeholder="Enter session token (e.g. pw-tok-78901)"
+              value={tokenInput}
+              onChange={(e) => setTokenInput(e.target.value)}
+              className="w-full pw-input pl-10 font-mono text-xs"
+            />
+          </div>
           <button
             onClick={() => fetchSessionByToken(tokenInput)}
             disabled={loading}
-            className="px-6 py-3 rounded-2xl bg-[#30D158] hover:bg-[#34D399] text-black font-extrabold text-xs shadow-lg shadow-[#30D158]/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="pw-button-primary text-xs py-2.5 px-6 disabled:opacity-50"
           >
-            {loading ? 'Fetching...' : 'Track Session'}
+            {loading ? 'Looking up...' : 'Track Session'}
           </button>
         </div>
       </div>
 
       {session ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Main Tracking Details (8 cols) */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="apple-card p-8 space-y-6">
-              
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
+        <div className="space-y-8">
+          {/* Main Session Card */}
+          <div className="pw-card p-6 sm:p-8 space-y-6">
+            
+            {/* Token & Status Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-pw-border">
+              <div>
+                <span className="text-xs text-pw-secondary block mb-1">Session Token</span>
+                <div className="flex items-center space-x-3">
+                  <span className="text-lg font-bold font-mono text-pw-text">{session.publicToken}</span>
+                  <button
+                    onClick={handleCopyTrackLink}
+                    className="text-xs text-pw-accent hover:text-pw-accent-hover flex items-center gap-1 font-medium"
+                  >
+                    {copiedLink ? <Check className="w-3.5 h-3.5 text-pw-success" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedLink ? 'Link Copied!' : 'Copy Link'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {statusInfo && StatusIcon && (
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold ${statusInfo.className}`}>
+                  <StatusIcon className="w-4 h-4" />
+                  <span>{statusInfo.label}</span>
+                </span>
+              )}
+            </div>
+
+            {/* Overview Details Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-pw-subtle p-5 rounded-xl border border-pw-border space-y-2">
+                <span className="text-xs font-semibold text-pw-secondary uppercase">Course & Format</span>
+                <h3 className="font-bold text-sm text-pw-text">{session.courseName}</h3>
+                <p className="text-xs text-pw-secondary capitalize">
+                  {session.sessionType.replace('_', ' ')} • {session.durationMins || 60} Minutes
+                </p>
+                <span className="inline-block text-xs font-semibold text-pw-success bg-pw-success-subtle px-2 py-0.5 rounded border border-pw-success/20">
+                  100% Free Peer Learning
+                </span>
+              </div>
+
+              <div className="bg-pw-subtle p-5 rounded-xl border border-pw-border space-y-2">
+                <span className="text-xs font-semibold text-pw-secondary uppercase">Student & Campus</span>
+                <h3 className="font-bold text-sm text-pw-text">{session.studentName}</h3>
+                <p className="text-xs text-pw-secondary">{session.collegeName}</p>
+                <span className="text-xs text-pw-secondary block font-mono">Contact: {session.studentContact}</span>
+              </div>
+            </div>
+
+            {/* Assigned Tutor & Venue */}
+            <div className="bg-pw-surface p-5 rounded-xl border border-pw-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3.5">
+                <div className="w-11 h-11 rounded-xl bg-pw-accent-subtle text-pw-accent flex items-center justify-center">
+                  <User className="w-6 h-6" />
+                </div>
                 <div>
-                  <span className="text-xs font-mono text-slate-400 block mb-1">Public Session Token</span>
-                  <span className="text-xl font-mono font-bold text-white flex items-center gap-2">
-                    {session.publicToken}
-                    <button
-                      onClick={handleCopyTrackLink}
-                      className="text-xs text-[#30D158] hover:underline flex items-center gap-1 font-sans"
-                    >
-                      {copiedLink ? <Check className="w-3.5 h-3.5 text-[#30D158]" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copiedLink ? 'Link Copied!' : 'Copy Link'}</span>
-                    </button>
-                  </span>
-                </div>
-                {getStatusBadge(session.sessionStatus)}
-              </div>
-
-              {/* Course & Session Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-xs">
-                <div className="space-y-3 bg-white/[0.03] p-5 rounded-2xl border border-white/[0.06]">
-                  <span className="text-slate-400 block uppercase font-bold tracking-wider text-[10px]">Session Overview</span>
-                  <div className="flex justify-between text-slate-300">
-                    <span>Subject:</span>
-                    <span className="font-bold text-white">{session.courseName}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-300">
-                    <span>Format:</span>
-                    <span className="font-bold text-white capitalize">{session.sessionType.replace('_', ' ')}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-300">
-                    <span>Cost:</span>
-                    <span className="font-bold text-[#30D158]">FREE (No Charge)</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3 bg-white/[0.03] p-5 rounded-2xl border border-white/[0.06]">
-                  <span className="text-slate-400 block uppercase font-bold tracking-wider text-[10px]">Campus Details</span>
-                  <div className="flex justify-between text-slate-300">
-                    <span>Campus:</span>
-                    <span className="font-bold text-white">{session.collegeName}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-300">
-                    <span>Student:</span>
-                    <span className="font-bold text-white">{session.studentName}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-300">
-                    <span>Status:</span>
-                    <span className="font-bold text-[#30D158] uppercase">{session.sessionStatus}</span>
-                  </div>
+                  <h4 className="font-bold text-sm text-pw-text">{session.tutorName || 'Arjun Reddy (Senior TA)'}</h4>
+                  <span className="text-xs text-pw-secondary">Assigned Campus Peer Tutor • 4.9 ★ Rating</span>
                 </div>
               </div>
 
-              {/* Assigned Tutor Card */}
-              <div className="bg-[#050508] border border-white/[0.08] p-6 rounded-2xl space-y-4">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#0A84FF]/20 text-[#0A84FF] border border-[#0A84FF]/30 flex items-center justify-center font-bold text-lg">
-                    <User className="w-6 h-6" />
-                  </div>
+              <div className="flex items-center space-x-2 text-xs text-pw-secondary bg-pw-subtle px-3.5 py-2 rounded-lg border border-pw-border">
+                <MapPin className="w-4 h-4 text-pw-accent shrink-0" />
+                <span>{session.locationOrLink || 'Library Discussion Room B3 / Google Meet'}</span>
+              </div>
+            </div>
+
+            {/* Progress Stepper */}
+            <div className="pt-6 border-t border-pw-border space-y-4">
+              <h4 className="text-xs font-semibold text-pw-secondary uppercase">Session Lifecycle</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="bg-pw-subtle p-3 rounded-lg border border-pw-border flex items-center space-x-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-pw-success shrink-0" />
                   <div>
-                    <h4 className="text-base font-extrabold text-white">{session.tutorName || 'Arjun Reddy (Senior TA)'}</h4>
-                    <span className="text-xs font-mono text-slate-400">Assigned Campus Peer Tutor • 4.9 ★ Rating</span>
+                    <strong className="text-xs text-pw-text block">1. Requested</strong>
+                    <span className="text-[11px] text-pw-secondary">Free session logged</span>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2 text-xs text-slate-300 font-mono bg-white/[0.04] p-3 rounded-xl">
-                  <MapPin className="w-4 h-4 text-[#30D158] shrink-0" />
-                  <span>Venue: {session.locationOrLink || 'Library Discussion Room B3 / Campus Academic Block'}</span>
+                <div className={`p-3 rounded-lg border flex items-center space-x-2.5 ${
+                  session.tutorName ? 'bg-pw-subtle border-pw-border' : 'bg-pw-accent-subtle border-pw-accent-border'
+                }`}>
+                  <CheckCircle2 className={`w-4 h-4 shrink-0 ${session.tutorName ? 'text-pw-success' : 'text-pw-accent'}`} />
+                  <div>
+                    <strong className="text-xs text-pw-text block">2. Tutor Assigned</strong>
+                    <span className="text-[11px] text-pw-secondary">{session.tutorName ? 'Tutor confirmed' : 'Matching TA'}</span>
+                  </div>
+                </div>
+
+                <div className={`p-3 rounded-lg border flex items-center space-x-2.5 ${
+                  session.sessionStatus === 'completed' ? 'bg-pw-success-subtle border-pw-success/30' : 'bg-pw-subtle border-pw-border opacity-70'
+                }`}>
+                  <CheckCircle2 className={`w-4 h-4 shrink-0 ${session.sessionStatus === 'completed' ? 'text-pw-success' : 'text-pw-tertiary'}`} />
+                  <div>
+                    <strong className="text-xs text-pw-text block">3. Completed</strong>
+                    <span className="text-[11px] text-pw-secondary">{session.sessionStatus === 'completed' ? 'Reviewed' : 'Awaiting meet'}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Post-Session Review Form (Unlocks after completion) */}
-            {session.sessionStatus === 'completed' && (
-              <div className="apple-card p-8 space-y-6">
-                <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2.5">
-                    <Star className="w-5 h-5 text-[#30D158]" />
-                    Leave Peer Session Review
-                  </h3>
-                  <span className="text-xs text-[#30D158] font-mono">Completed Session</span>
-                </div>
-
-                {reviewSubmitted ? (
-                  <div className="p-6 rounded-2xl bg-[#30D158]/10 border border-[#30D158]/30 text-center space-y-2">
-                    <CheckCircle2 className="w-8 h-8 text-[#30D158] mx-auto" />
-                    <h4 className="text-base font-bold text-white">Thank you for your feedback!</h4>
-                    <p className="text-xs text-slate-300">Your review awards volunteer Karma points to your peer tutor.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-xs font-mono text-slate-300 block mb-2">Select Rating (1 to 5 Stars)</label>
-                      <div className="flex space-x-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            onClick={() => setRating(star)}
-                            className={`p-2.5 rounded-xl border text-sm font-bold flex items-center gap-1 transition-all ${
-                              rating >= star
-                                ? 'bg-[#30D158]/20 text-[#30D158] border-[#30D158]'
-                                : 'bg-white/[0.04] text-slate-500 border-white/[0.08]'
-                            }`}
-                          >
-                            <Star className="w-4 h-4 fill-current" />
-                            <span>{star}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-mono text-slate-300 block mb-1">Your Review / Feedback</label>
-                      <textarea
-                        rows={3}
-                        placeholder="Explain how the peer session helped you prepare for your exam..."
-                        value={reviewText}
-                        onChange={(e) => setReviewText(e.target.value)}
-                        className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#30D158]"
-                      />
-                    </div>
-
-                    <button
-                      onClick={handleReviewSubmit}
-                      className="flex items-center space-x-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#30D158] to-[#10B981] text-black font-extrabold text-xs shadow-lg shadow-[#30D158]/20"
-                    >
-                      <Send className="w-4 h-4 stroke-[2.5]" />
-                      <span>Submit Tutor Review</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
-          {/* Right Column: Status Timeline & Info (4 cols) */}
-          <div className="lg:col-span-4 space-y-6">
-            <div className="apple-card p-8 space-y-6">
-              <h3 className="text-base font-bold text-white font-mono uppercase tracking-wider">Session Lifecycle</h3>
-              
-              <div className="space-y-6 relative border-l-2 border-white/[0.08] ml-3 pl-6">
-                <div className="relative">
-                  <span className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-[#30D158] ring-4 ring-black" />
-                  <h4 className="text-xs font-bold text-white">Session Requested</h4>
-                  <p className="text-[11px] text-slate-400 font-mono">100% Free order logged</p>
-                </div>
-
-                <div className="relative">
-                  <span className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full ${session.tutorId ? 'bg-[#30D158]' : 'bg-[#0A84FF] animate-pulse'} ring-4 ring-black`} />
-                  <h4 className="text-xs font-bold text-white">Peer Tutor Assignment</h4>
-                  <p className="text-[11px] text-slate-400 font-mono">{session.tutorName ? 'Assigned: ' + session.tutorName : 'Matching Campus TA'}</p>
-                </div>
-
-                <div className="relative">
-                  <span className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full ${session.sessionStatus === 'completed' ? 'bg-[#30D158]' : 'bg-slate-600'} ring-4 ring-black`} />
-                  <h4 className="text-xs font-bold text-white">Campus Study Session</h4>
-                  <p className="text-[11px] text-slate-400 font-mono">{session.sessionStatus === 'completed' ? 'Completed & Confirmed' : 'Campus Handoff Pending'}</p>
-                </div>
+          {/* Post-Session Review Form */}
+          {session.sessionStatus === 'completed' && (
+            <div className="pw-card p-6 sm:p-8 space-y-6">
+              <div className="pb-4 border-b border-pw-border">
+                <h3 className="text-lg font-bold text-pw-text flex items-center gap-2">
+                  <Star className="w-5 h-5 text-amber-500" />
+                  Leave Tutor Feedback & Academic Karma
+                </h3>
+                <p className="text-xs text-pw-secondary mt-1">
+                  Your feedback rewards your senior TA with recognized volunteer hours and campus karma points.
+                </p>
               </div>
+
+              {reviewSubmitted ? (
+                <div className="p-6 rounded-xl bg-pw-success-subtle border border-pw-success/30 text-center space-y-2">
+                  <CheckCircle2 className="w-8 h-8 text-pw-success mx-auto" />
+                  <h4 className="font-bold text-pw-text">Feedback submitted successfully!</h4>
+                  <p className="text-xs text-pw-secondary">Thank you for supporting student-to-student peer learning.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleReviewSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-pw-text mb-2">Rating</label>
+                    <div className="flex space-x-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setRating(star)}
+                          className={`px-3 py-2 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                            rating >= star
+                              ? 'bg-amber-50 text-amber-700 border-amber-300'
+                              : 'bg-pw-subtle text-pw-secondary border-pw-border'
+                          }`}
+                        >
+                          <Star className="w-3.5 h-3.5 fill-current" />
+                          <span>{star} Stars</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-pw-text mb-1.5">Your Review Notes</label>
+                    <textarea
+                      rows={3}
+                      placeholder="How did this peer session help you prepare for your exam or lab viva?"
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      className="w-full pw-input"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="pw-button-primary text-xs py-2.5 px-6 flex items-center space-x-2"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Submit Review</span>
+                  </button>
+                </form>
+              )}
             </div>
-          </div>
+          )}
         </div>
       ) : (
-        <div className="apple-card p-12 text-center text-slate-400 font-mono text-xs">
+        <div className="pw-card p-12 text-center text-pw-secondary text-sm">
           No session found for this token. Enter a valid token above to track your booking.
         </div>
       )}

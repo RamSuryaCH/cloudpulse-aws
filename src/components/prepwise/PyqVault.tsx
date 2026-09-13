@@ -3,9 +3,11 @@ import {
   FileText, 
   Download, 
   Search, 
-  Eye, 
   Check, 
-  Copy 
+  Copy, 
+  ChevronDown,
+  ChevronUp,
+  Code2
 } from 'lucide-react';
 import { SEED_PYQS } from '../../data/prepwiseData';
 import type { PyqPaper } from '../../types/prepwise';
@@ -14,163 +16,188 @@ import { sounds } from '../../utils/soundEffects';
 export const PyqVault: React.FC = () => {
   const [pyqs] = useState<PyqPaper[]>(SEED_PYQS);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPyq, setSelectedPyq] = useState<PyqPaper>(SEED_PYQS[0]);
-  const [copiedSnippet, setCopiedSnippet] = useState(false);
+  const [activeTypeFilter, setActiveTypeFilter] = useState<string>('all');
+  const [expandedPyqId, setExpandedPyqId] = useState<string | null>(SEED_PYQS[0].id);
+  const [copiedSnippetId, setCopiedSnippetId] = useState<string | null>(null);
 
-  const filteredPyqs = pyqs.filter(p => 
-    p.subjectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.subjectCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.topics.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredPyqs = pyqs.filter(p => {
+    const matchesQuery = 
+      p.subjectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.subjectCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.topics.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesType = activeTypeFilter === 'all' || p.type === activeTypeFilter;
+    return matchesQuery && matchesType;
+  });
 
-  const handleCopyCode = () => {
+  const handleCopyCode = (pyq: PyqPaper) => {
     sounds.playSuccess();
-    navigator.clipboard.writeText(selectedPyq.solutionSnippet);
-    setCopiedSnippet(true);
-    setTimeout(() => setCopiedSnippet(false), 2000);
+    navigator.clipboard.writeText(pyq.solutionSnippet);
+    setCopiedSnippetId(pyq.id);
+    setTimeout(() => setCopiedSnippetId(null), 2000);
   };
 
-  const handleDownload = (pyqName: string) => {
+  const handleDownload = (pyq: PyqPaper) => {
     sounds.playSuccess();
-    alert(`Downloading ${pyqName} solved PYQ paper PDF...`);
+    alert(`Downloading verified solved PDF for ${pyq.subjectName} (${pyq.subjectCode} - ${pyq.year})...`);
+  };
+
+  const toggleExpand = (id: string) => {
+    sounds.playSwitch();
+    setExpandedPyqId(prev => prev === id ? null : id);
   };
 
   return (
-    <div className="space-y-12">
+    <div className="max-w-4xl mx-auto space-y-10">
       {/* Header Banner */}
-      <div className="space-y-4 max-w-3xl">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#30D158]/10 border border-[#30D158]/30 text-[#30D158] text-xs font-mono font-semibold">
-          <FileText className="w-3.5 h-3.5" />
-          <span>Open Campus Exam Question Bank & Solved Vault</span>
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-          PYQ & Solved Notes Vault
+      <div className="space-y-4">
+        <span className="text-xs font-semibold text-pw-accent uppercase tracking-wider">Exam Preparation Archive</span>
+        <h1 className="text-3xl sm:text-4xl font-bold text-pw-text">
+          Solved PYQ Papers & Viva Notes Vault
         </h1>
-        <p className="text-base text-slate-400 leading-relaxed">
-          Access free solved previous year question papers, formula cheat sheets, and verified lab code walkthroughs curated by campus senior TAs.
+        <p className="text-base text-pw-secondary leading-relaxed">
+          Access verified step-by-step solutions for previous semester exams, formulas, and lab viva code walkthroughs written by senior TAs.
         </p>
 
-        {/* Search Bar */}
-        <div className="flex space-x-3 max-w-xl">
+        {/* Search & Filter Bar */}
+        <div className="pt-2 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+            <Search className="w-4 h-4 text-pw-tertiary absolute left-3.5 top-3.5" />
             <input
               type="text"
-              placeholder="Search PYQs by subject, code, or topic (e.g. Dynamic Programming)..."
+              placeholder="Search by subject, code (e.g. CS201), or topic (e.g. Dynamic Programming)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-2xl pl-11 pr-5 py-3 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-[#30D158]"
+              className="w-full pw-input pl-10"
             />
+          </div>
+
+          <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar">
+            {['all', 'Mid-Exam', 'End-Exam', 'Lab-Viva'].map((type) => (
+              <button
+                key={type}
+                onClick={() => {
+                  sounds.playClick();
+                  setActiveTypeFilter(type);
+                }}
+                className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                  activeTypeFilter === type
+                    ? 'bg-pw-text text-white font-semibold'
+                    : 'bg-pw-subtle text-pw-secondary hover:bg-pw-muted'
+                }`}
+              >
+                {type === 'all' ? 'All Formats' : type}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Grid: PYQ List (7 cols) vs Solution Viewer Drawer (5 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* PYQ Cards List (7 cols) */}
-        <div className="lg:col-span-7 space-y-4">
-          {filteredPyqs.map((pyq) => {
-            const isSelected = selectedPyq.id === pyq.id;
+      {/* Papers Accordion List */}
+      <div className="space-y-4">
+        {filteredPyqs.length === 0 ? (
+          <div className="pw-card p-12 text-center text-pw-secondary text-sm">
+            No question papers found matching your search. Try another subject or keyword.
+          </div>
+        ) : (
+          filteredPyqs.map((pyq) => {
+            const isExpanded = expandedPyqId === pyq.id;
             return (
-              <div
-                key={pyq.id}
-                onClick={() => {
-                  sounds.playSwitch();
-                  setSelectedPyq(pyq);
-                }}
-                className={`p-6 rounded-2xl border cursor-pointer transition-all duration-200 ${
-                  isSelected
-                    ? 'bg-white/[0.1] border-[#30D158] shadow-lg shadow-[#30D158]/10'
-                    : 'bg-white/[0.03] border-white/[0.08] hover:bg-white/[0.06]'
-                }`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <span className="font-mono text-xs text-[#30D158] font-bold block mb-0.5">{pyq.subjectCode} • {pyq.year} ({pyq.type})</span>
-                    <h3 className="text-base font-extrabold text-white">{pyq.subjectName}</h3>
+              <div key={pyq.id} className="pw-card overflow-hidden transition-all">
+                {/* Main Card Summary */}
+                <div 
+                  onClick={() => toggleExpand(pyq.id)}
+                  className="p-6 cursor-pointer hover:bg-pw-subtle/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                >
+                  <div className="space-y-1.5">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-mono font-bold text-pw-accent bg-pw-accent-subtle px-2 py-0.5 rounded border border-pw-accent-border">
+                        {pyq.subjectCode}
+                      </span>
+                      <span className="text-xs font-medium text-pw-secondary">
+                        {pyq.year} • {pyq.semester} ({pyq.type})
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-pw-text flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-pw-accent" />
+                      {pyq.subjectName}
+                    </h3>
+
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {pyq.topics.map((t, idx) => (
+                        <span key={idx} className="text-[11px] font-medium px-2 py-0.5 rounded bg-pw-subtle text-pw-secondary border border-pw-border">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <span className="text-xs font-mono text-slate-400 bg-white/[0.06] px-2.5 py-1 rounded-full border border-white/[0.08]">
-                    {pyq.downloads} Downloads
-                  </span>
+
+                  <div className="flex items-center space-x-3 shrink-0 self-end sm:self-center">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload(pyq);
+                      }}
+                      className="pw-button-secondary text-xs py-2 px-3.5 flex items-center space-x-1.5"
+                    >
+                      <Download className="w-3.5 h-3.5 text-pw-secondary" />
+                      <span>Download PDF</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      aria-label="Toggle solution preview"
+                      className="w-8 h-8 rounded-lg bg-pw-subtle hover:bg-pw-muted flex items-center justify-center text-pw-secondary"
+                    >
+                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {pyq.topics.map((t, idx) => (
-                    <span key={idx} className="text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-white/[0.04] text-slate-300 border border-white/[0.06]">
-                      {t}
-                    </span>
-                  ))}
-                </div>
+                {/* Expandable Verified Solution Snippet */}
+                {isExpanded && (
+                  <div className="border-t border-pw-border bg-pw-subtle p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2 text-xs font-semibold text-pw-text">
+                        <Code2 className="w-4 h-4 text-pw-accent" />
+                        <span>Key Formula / Verified Code Solution:</span>
+                      </div>
+                      <button
+                        onClick={() => handleCopyCode(pyq)}
+                        className="text-xs font-medium text-pw-accent hover:text-pw-accent-hover flex items-center space-x-1"
+                      >
+                        {copiedSnippetId === pyq.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-pw-success" />
+                            <span className="text-pw-success">Copied to Clipboard!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy Snippet</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-white/[0.06] text-xs font-mono">
-                  <span className="text-slate-400">{pyq.questionsCount} Solved Exam Questions</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDownload(pyq.subjectName);
-                    }}
-                    className="flex items-center space-x-1.5 text-[#30D158] hover:underline font-bold"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download Free PDF</span>
-                  </button>
-                </div>
+                    <div className="bg-pw-surface p-4 rounded-xl border border-pw-border">
+                      <pre className="font-mono text-xs text-pw-text overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                        {pyq.solutionSnippet}
+                      </pre>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-pw-secondary pt-1">
+                      <span>Verified by Senior Campus Coordinators • {pyq.downloads} students downloaded</span>
+                      <span className="text-pw-success font-semibold">100% Free Open Resource</span>
+                    </div>
+                  </div>
+                )}
               </div>
             );
-          })}
-        </div>
-
-        {/* Selected PYQ Solution Previewer Drawer (5 cols) */}
-        <div className="lg:col-span-5 sticky top-28">
-          <div className="apple-card p-8 space-y-6 border-2 border-[#30D158]/30">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-              <div>
-                <span className="text-xs font-mono text-[#30D158] font-bold block mb-1">Interactive Solution Preview</span>
-                <h3 className="text-base font-bold text-white">{selectedPyq.subjectName}</h3>
-              </div>
-              <Eye className="w-5 h-5 text-[#30D158]" />
-            </div>
-
-            <div className="space-y-3 font-mono text-xs">
-              <span className="text-slate-400 uppercase tracking-wider text-[10px] block font-bold">Key Formula / Code Solution:</span>
-              <div className="bg-[#050508] p-4 rounded-xl border border-white/[0.08] relative group">
-                <pre className="text-emerald-400 overflow-x-auto whitespace-pre-wrap font-mono text-xs leading-relaxed">
-                  {selectedPyq.solutionSnippet}
-                </pre>
-                <button
-                  onClick={handleCopyCode}
-                  className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-slate-300 transition-colors"
-                >
-                  {copiedSnippet ? <Check className="w-3.5 h-3.5 text-[#30D158]" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2 pt-3 border-t border-white/[0.08] font-mono text-xs text-slate-300">
-              <div className="flex justify-between">
-                <span>Exam Format:</span>
-                <strong className="text-white">{selectedPyq.type}</strong>
-              </div>
-              <div className="flex justify-between">
-                <span>Verified By:</span>
-                <strong className="text-[#30D158]">Senior Campus TAs</strong>
-              </div>
-              <div className="flex justify-between">
-                <span>Access:</span>
-                <strong className="text-[#30D158]">100% Free</strong>
-              </div>
-            </div>
-
-            <button
-              onClick={() => handleDownload(selectedPyq.subjectName)}
-              className="w-full flex items-center justify-center space-x-2 py-3 rounded-2xl bg-gradient-to-r from-[#30D158] to-[#10B981] text-black font-extrabold text-xs shadow-lg shadow-[#30D158]/20"
-            >
-              <Download className="w-4 h-4 stroke-[2.5]" />
-              <span>Download Complete Solved PDF</span>
-            </button>
-          </div>
-        </div>
+          })
+        )}
       </div>
     </div>
   );
